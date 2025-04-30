@@ -1,0 +1,8 @@
+import 'package:flame/game.dart';
+import 'package:flame_practice/game.dart';
+import 'package:flutter/material.dart';
+
+void main() {
+  final MyGame game = MyGame();
+  runApp(GameWidget(game: game));
+}
