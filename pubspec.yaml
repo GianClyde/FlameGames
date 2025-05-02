@@ -22,5 +22,6 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/numbers/
     - assets/images/cards/
     - assets/images/holders/

@@ -7,7 +7,9 @@ import 'package:flame_practice/components/game_card.dart';
 import 'package:flame_practice/components/game_timer.dart';
 import 'package:flame_practice/components/header_text.dart';
 import 'package:flame_practice/components/money_holder.dart';
+import 'package:flame_practice/components/player.dart';
 import 'package:flame_practice/components/table.dart';
+import 'package:flame_practice/models/card.dart';
 
 class MyGame extends FlameGame {
   late Table table;
@@ -29,12 +31,22 @@ class MyGame extends FlameGame {
 
   late MoneyHolder moneyHolder;
 
+  late Map<String, Player> playerMaps;
+
+  final int playersCount;
+
+  MyGame({
+    super.children,
+    super.world,
+    super.camera,
+    required this.playersCount,
+  });
+
   @override
   Future<void> onLoad() async {
     await Flame.device.fullScreen();
     await Flame.device.setLandscape();
 
-    // Load background sprite first
     final backgroundSprite = await loadSprite('background.png');
     final background = SpriteComponent(
       sprite: backgroundSprite,
@@ -49,6 +61,8 @@ class MyGame extends FlameGame {
   void startGame() async {
     _createTable();
     _createHeaderText();
+    _createGameTimer();
+    await _createPlayers();
     await _createZoomedCards();
     await _createZoomedCardHolders();
     await _createMoneyHolder();
@@ -68,36 +82,57 @@ class MyGame extends FlameGame {
       size: Vector2(100, 100),
     );
 
-    List<Sprite> timerSprites = [await loadSprite('')];
+    List<Sprite> timerSprites = [];
+    for (int i = 0; i <= 9; i++) {
+      timerSprites.add(await loadSprite('numbers/$i.png'));
+    }
+
     gameTimer = GameTimer(
       sprites: timerSprites,
-      spriteComponent: SpriteComponent(size: Vector2(100, 100)),
+      //spriteComponent: SpriteComponent(size: Vector2(100, 100)),
       backgroundSprite: background,
+      position: Vector2(size.x - 150, 30),
     );
+
+    add(gameTimer);
+  }
+
+  Future<void> _createPlayers() async {
+    playerMaps = {};
+    final card1 = Card(
+      suit: "Spades",
+      value: "4",
+      imagePath: 'cards/clubs_4.png',
+    );
+    for (int i = 0; i <= playersCount; i++) {
+      playerMaps['player$i'] = Player(
+        userName: "player$i",
+        card1: card1,
+        card2: card1,
+      );
+
+      add(playerMaps['player$i']!);
+    }
   }
 
   Future<void> _createZoomedCards() async {
     final frontSprite = await loadSprite('cards/clubs_2.png');
-    final backSprite = await loadSprite('cards/other_back_red.png');
     //final _yPosition = size.x / 2 - 420;
 
     card1 = GameCard(
       frontSprite: frontSprite,
-      backSprite: backSprite,
       //position: Vector2(_yPosition, (size.y * 0.1 - 20)),
       size: Vector2(70, 90),
     );
 
     guessCard = GameCard(
       frontSprite: frontSprite,
-      backSprite: backSprite,
       //position: Vector2(_yPosition, (size.y * 0.1) + 120 + 10),
       size: Vector2(70, 90),
     );
 
     card2 = GameCard(
       frontSprite: frontSprite,
-      backSprite: backSprite,
       //position: Vector2(_yPosition, (size.y * 0.1) + 230 + 10 + 10),
       size: Vector2(70, 90),
     );
@@ -150,5 +185,10 @@ class MyGame extends FlameGame {
   void _createTable() {
     table = Table(position: Vector2(size.x / 2, size.y / 2));
     add(table);
+  }
+
+  void timerEnded() {
+    card1.startFlip();
+    card2.startFlip();
   }
 }

@@ -7,7 +7,7 @@ class Table extends SpriteComponent with HasGameReference<MyGame> {
   static const double _maxSize = 500;
 
   Table({required super.position, double size = _maxSize})
-    : super(size: Vector2(800, 400), anchor: Anchor.center, priority: 1);
+    : super(size: Vector2(850, 450), anchor: Anchor.center, priority: 1);
 
   @override
   FutureOr<void> onLoad() async {

@@ -1,30 +1,31 @@
 import 'dart:async';
-
 import 'package:flame/components.dart';
 import 'package:flame_practice/components/game_card.dart';
 
 class CardHolder extends SpriteComponent {
-  late GameCard gameCard;
+  final GameCard? gameCard;
+
   CardHolder({
-    required GameCard generatedGameCard,
     required Sprite holderSprite,
+    GameCard? generatedGameCard,
     super.position,
     super.size,
-  }) : super(sprite: holderSprite, priority: 9) {
-    gameCard = generatedGameCard;
-  }
+    super.scale,
+  }) : gameCard = generatedGameCard,
+       super(sprite: holderSprite, priority: 9);
 
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
 
-    gameCard.size = Vector2(90, 100);
+    if (gameCard != null) {
+      gameCard!.size = Vector2(70, 90);
+      gameCard!.position = Vector2(
+        (size.x - gameCard!.size.x) / 2,
+        (size.y - gameCard!.size.y) / 2,
+      );
 
-    gameCard.position = Vector2(
-      (size.x - gameCard.size.x) / 2 + 10,
-      (size.y - gameCard.size.y) / 2 + 5,
-    );
-
-    add(gameCard);
+      add(gameCard!);
+    }
   }
 }
