@@ -42,9 +42,9 @@ class MyGame extends FlameGame {
 
   void startGame() async {
     _createTable();
+    await _createZoomedCards();
     await _createZoomedCardHolders();
     await _createMoneyHolder();
-    // await _createZoomedCards();
   }
 
   Future<void> _createZoomedCards() async {
@@ -55,27 +55,23 @@ class MyGame extends FlameGame {
     card1 = GameCard(
       frontSprite: frontSprite,
       backSprite: backSprite,
-      position: Vector2(_yPosition, (size.y * 0.1)),
-      size: Vector2(80, 110),
+      //position: Vector2(_yPosition, (size.y * 0.1 - 20)),
+      size: Vector2(80, 90),
     );
 
     guessCard = GameCard(
       frontSprite: frontSprite,
       backSprite: backSprite,
-      position: Vector2(_yPosition, (size.y * 0.1) + 120 + 10),
-      size: Vector2(80, 110),
+      //position: Vector2(_yPosition, (size.y * 0.1) + 120 + 10),
+      size: Vector2(80, 90),
     );
 
     card2 = GameCard(
       frontSprite: frontSprite,
       backSprite: backSprite,
-      position: Vector2(_yPosition, (size.y * 0.1) + 230 + 10 + 10),
-      size: Vector2(80, 110),
+      //position: Vector2(_yPosition, (size.y * 0.1) + 230 + 10 + 10),
+      size: Vector2(80, 90),
     );
-
-    add(card1);
-    add(guessCard);
-    add(card2);
   }
 
   Future<void> _createZoomedCardHolders() async {
@@ -88,18 +84,21 @@ class MyGame extends FlameGame {
       holderSprite: shadowSprite,
       position: Vector2(_yPosition, (size.y * 0.1 - 20)),
       size: Vector2(100, 120),
+      generatedGameCard: card1,
     );
 
     guessCardHolder = CardHolder(
       holderSprite: guessSprite,
       position: Vector2(_yPosition, (size.y * 0.1 - 20) + 95 + 10),
       size: Vector2(100, 120),
+      generatedGameCard: guessCard,
     );
 
     cardHolder2 = CardHolder(
       holderSprite: shadowSprite,
       position: Vector2(_yPosition, (size.y * 0.1 - 20) + 190 + 10 + 10),
       size: Vector2(100, 120),
+      generatedGameCard: card2,
     );
 
     add(cardHolder1);
