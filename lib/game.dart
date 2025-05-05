@@ -273,12 +273,14 @@ class MyGame extends FlameGame {
       removeOnFinish: true,
       onTick: () async {
         if (gameTimer.hasEnded && !hasShownWinnerOverlay) {
-          isWinner = checkResults(bet: "not in between");
+          isWinner = checkResults(bet: "in between");
           print("Result: $isWinner");
 
           await _createWinnerOverlay();
           hasShownWinnerOverlay = true;
-
+          card1.resetFlip();
+          guessCard.resetFlip();
+          card2.resetFlip();
           startIntervalTimer(5);
         }
       },
