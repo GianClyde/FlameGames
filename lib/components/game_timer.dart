@@ -71,8 +71,8 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
   }
 
   void start() {
+    hasEnded = false;
     if (!_timer.isRunning()) {
-      hasEnded = false;
       _timer.start();
     }
   }
