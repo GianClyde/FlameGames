@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/timer.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +14,7 @@ class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
 
   late SpriteComponent tensSprite;
   late SpriteComponent onesSprite;
+  late TextComponent textLabel;
 
   GameOverlayTimer({
     required this.backgroundSprite,
@@ -23,8 +23,15 @@ class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
     this.startTime = 10,
     super.position,
     super.size,
+    super.priority,
   }) : _currentTick = startTime {
-    _timer = Timer(tickDuration, onTick: _updateSprite, repeat: true);
+    debugMode = true;
+    _timer = Timer(
+      tickDuration,
+      onTick: _updateSprite,
+      repeat: true,
+      autoStart: true,
+    );
   }
 
   @override
@@ -37,21 +44,34 @@ class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
 
     final overlayBackground = RectangleComponent(
       size: size,
+      position: Vector2.zero(),
+      priority: 12,
       // ignore: deprecated_member_use
       paint: Paint()..color = Colors.black.withOpacity(0.6),
     );
-
     add(overlayBackground);
 
-    tensSprite = SpriteComponent(size: Vector2(30, 40));
-    onesSprite = SpriteComponent(size: Vector2(30, 40));
+    textLabel = TextComponent(
+      text: 'Game starts in',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 24,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      anchor: Anchor.center,
+      position: Vector2(size.x / 2, size.y / 2 - 50),
+    );
+    add(textLabel);
 
-    tensSprite.position = Vector2(size.x / 2 - 30, size.y / 2);
-    onesSprite.position = Vector2(size.x / 2 + 10, size.y / 2);
+    tensSprite = SpriteComponent(size: Vector2(30, 40))
+      ..position = Vector2(size.x / 2 - 30, size.y / 2);
+    onesSprite = SpriteComponent(size: Vector2(30, 40))
+      ..position = Vector2(size.x / 2 + 10, size.y / 2);
 
     _updateNumberSprites(_currentTick);
 
-    //add(backgroundSprite);
     add(tensSprite);
     add(onesSprite);
   }

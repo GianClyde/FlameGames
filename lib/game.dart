@@ -108,6 +108,8 @@ class MyGame extends FlameGame {
   //Crete beginning overlay
   Future<void> _createStartCountdown() async {
     _startingGameOverlayTimer = GameOverlayTimer(
+      position: Vector2(size.x, size.y),
+      priority: 12,
       backgroundSprite: SpriteComponent(
         sprite: await loadSprite('timer_bg.png'),
         size: Vector2(100, 100),
