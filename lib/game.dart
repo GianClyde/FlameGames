@@ -38,15 +38,13 @@ class MyGame extends FlameGame {
   final Room room;
   late double angle;
   late PlayerModel activePlayer;
-  late int currentPlayerIndex;
+  int currentPlayerIndex = 0;
   late final Images images;
 
   late List<Sprite> timerSprites;
 
   //beginning overlay
   late GameOverlayTimer _startingGameOverlayTimer;
-
-  //winner overlay
 
   // Predefined table positions for players
   final List<Vector2> tableCoordinates = [
@@ -58,9 +56,10 @@ class MyGame extends FlameGame {
     Vector2(275, 160),
   ];
 
-  //result
+  // Result tracking
   late String cardResult;
   late bool isWinner;
+  bool hasShownWinnerOverlay = false;
 
   MyGame({super.children, super.world, super.camera, required this.room});
 
@@ -73,7 +72,6 @@ class MyGame extends FlameGame {
     startGame();
   }
 
-  // Initializes the game setup
   void startGame() async {
     timerSprites = [];
     for (int i = 0; i <= 9; i++) {
@@ -85,6 +83,7 @@ class MyGame extends FlameGame {
     _createHeaderText();
     _createGameTimer();
     _createStartCountdown();
+
     card1Val = await Card.generateRandomCard(images);
     guessCardVal = await Card.generateRandomCard(images);
     card2Val = await Card.generateRandomCard(images);
@@ -95,7 +94,6 @@ class MyGame extends FlameGame {
     await _createMoneyHolder();
   }
 
-  // Background setup
   Future<void> _createBackground() async {
     final backgroundSprite = await loadSprite('background.png');
     final background = SpriteComponent(
@@ -106,7 +104,6 @@ class MyGame extends FlameGame {
     await add(background);
   }
 
-  // UI Header
   Future<void> _createHeaderText() async {
     headerText = HeaderText(
       userName: "JM",
@@ -115,7 +112,6 @@ class MyGame extends FlameGame {
     add(headerText);
   }
 
-  //Create beginning overlay
   Future<void> _createStartCountdown() async {
     _startingGameOverlayTimer = GameOverlayTimer(
       size: size,
@@ -132,16 +128,21 @@ class MyGame extends FlameGame {
   }
 
   Future<void> _createWinnerOverlay() async {
-    final WinOverlay winOverlay = WinOverlay(
+    final existing = children.whereType<WinOverlay>().toList();
+    for (final overlay in existing) {
+      overlay.removeFromParent();
+    }
+
+    final winOverlay = WinOverlay(
       size: size,
       position: Vector2.zero(),
       priority: 12,
-      isWinner: checkResults(bet: "in between"),
+      isWinner: isWinner,
     );
+
     add(winOverlay);
   }
 
-  // Timer setup
   Future<void> _createGameTimer() async {
     final background = SpriteComponent(
       sprite: await loadSprite('timer_bg.png'),
@@ -157,7 +158,6 @@ class MyGame extends FlameGame {
     add(gameTimer);
   }
 
-  // Player setup
   Future<void> _createPlayers() async {
     playerMaps = {};
     final card1 = Card(
@@ -185,7 +185,6 @@ class MyGame extends FlameGame {
     }
   }
 
-  // determine playe position on table
   double _calculatePlayerAngle(int index) {
     if (index == 2) return 270 * (3.14159265 / 180);
     if (index == 3 || index == 4) return 180 * (3.14159265 / 180);
@@ -193,14 +192,12 @@ class MyGame extends FlameGame {
     return 0;
   }
 
-  // Creating the zoomed-in game cards
   Future<void> _createZoomedCards() async {
     card1 = GameCard(size: Vector2(70, 90), card: card1Val);
     guessCard = GameCard(size: Vector2(70, 90), card: guessCardVal);
     card2 = GameCard(size: Vector2(70, 90), card: card2Val);
   }
 
-  //zoomed-in card holders
   Future<void> _createZoomedCardHolders() async {
     shadowSprite = await loadSprite('cards/card_shadow.png');
     guessSprite = await loadSprite('cards/question_card.png');
@@ -234,7 +231,6 @@ class MyGame extends FlameGame {
     add(cardHolder2);
   }
 
-  //money holder
   Future<void> _createMoneyHolder() async {
     final moneyHolderSprite = await loadSprite('holders/amount_holder.png');
     final yPosition = size.x / 2 - 460;
@@ -248,18 +244,12 @@ class MyGame extends FlameGame {
     add(moneyHolder);
   }
 
-  //game table
   void _createTable() {
     table = Table(position: Vector2(size.x / 2, size.y / 2));
     add(table);
   }
 
-  // Funcation for timer completion
   void timerEnded() {
-    guessCard.startFlip();
-    card1.startFlip();
-    card2.startFlip();
-
     gameFlow();
   }
 
@@ -267,31 +257,43 @@ class MyGame extends FlameGame {
     gameTimer.start();
   }
 
-  //call in gameflow
   Future<void> switchToNextPlayer() async {
     currentPlayerIndex = (currentPlayerIndex + 1) % room.listPlayers.length;
     activePlayer = room.listPlayers[currentPlayerIndex];
 
-    print("active player: ${activePlayer.user}");
-
+    print("Active player: ${activePlayer.user}");
     gameTimer.reset();
   }
 
   Future<void> gameFlow() async {
-    if (gameTimer.hasEnded) {
-      isWinner = checkResults(bet: "not in between");
-      print("REsult:  $isWinner");
-      _createWinnerOverlay();
-    }
+    guessCard.startFlip();
 
-    startIntervalTimer();
+    TimerComponent delayTimer = TimerComponent(
+      period: 2.0,
+      removeOnFinish: true,
+      onTick: () async {
+        if (gameTimer.hasEnded && !hasShownWinnerOverlay) {
+          isWinner = checkResults(bet: "not in between");
+          print("Result: $isWinner");
+
+          await _createWinnerOverlay();
+          hasShownWinnerOverlay = true;
+
+          startIntervalTimer(5);
+        }
+      },
+    );
+
+    add(delayTimer);
   }
 
-  void startIntervalTimer() {
+  void startIntervalTimer(double period) {
     TimerComponent intervalTimer = TimerComponent(
-      period: 5,
+      period: period,
       removeOnFinish: true,
       onTick: () {
+        hasShownWinnerOverlay = false;
+        switchToNextPlayer();
         gameTimer.start();
       },
     );
@@ -304,12 +306,8 @@ class MyGame extends FlameGame {
       card2: card2Val,
       guessCard: guessCardVal,
     );
-    print("card result: ${cardResult} bet: ${bet}");
-    if (bet == cardResult) {
-      return true;
-    }
-
-    return false;
+    print("card result: $cardResult bet: $bet");
+    return bet == cardResult;
   }
 
   String compareGuessToRange({
@@ -342,13 +340,9 @@ class MyGame extends FlameGame {
     }
 
     if (val1 == val2) {
-      if (guessVal > val1) {
-        return 'higher';
-      } else if (guessVal < val1) {
-        return 'lower';
-      } else {
-        return 'equal';
-      }
+      if (guessVal > val1) return 'higher';
+      if (guessVal < val1) return 'lower';
+      return 'equal';
     }
 
     int minVal = val1 < val2 ? val1 : val2;
