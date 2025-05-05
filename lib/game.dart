@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
@@ -12,41 +13,69 @@ import 'package:flame_practice/components/table.dart';
 import 'package:flame_practice/models/card.dart';
 
 class MyGame extends FlameGame {
+  // Core game components
   late Table table;
-
-  late CardHolder cardHolder1;
-  late CardHolder guessCardHolder;
-  late CardHolder cardHolder2;
-
-  late GameCard card1;
-  late GameCard guessCard;
-  late GameCard card2;
-
-  late Sprite shadowSprite;
-  late Sprite guessSprite;
-
   late HeaderText headerText;
-
   late GameTimer gameTimer;
-
   late MoneyHolder moneyHolder;
 
+  // Card holders and zoomed cards
+  late CardHolder cardHolder1, guessCardHolder, cardHolder2;
+  late GameCard card1, guessCard, card2;
+  late Sprite shadowSprite, guessSprite;
+
+  //Card Values for Logic purposes
+  late Card card1Val;
+  late Card guessCardVal;
+  late Card card2Val;
+
+  // Player-related properties
   late Map<String, Player> playerMaps;
-
   final int playersCount;
+  late double angle;
 
-  MyGame({
-    super.children,
-    super.world,
-    super.camera,
-    required this.playersCount,
-  });
+  late final Images images;
+
+  // Predefined table positions for players
+  final List<Vector2> tableCoordinates = [
+    Vector2(320, 260),
+    Vector2(530, 260),
+    Vector2(670, 245),
+    Vector2(620, 140),
+    Vector2(410, 140),
+    Vector2(275, 160),
+  ];
+
+  MyGame({required this.playersCount});
 
   @override
   Future<void> onLoad() async {
     await Flame.device.fullScreen();
     await Flame.device.setLandscape();
+    images = Images();
+    await _createBackground();
+    startGame();
+  }
 
+  // Initializes the game setup
+  void startGame() async {
+    await images.loadAll(['cards/other_back_red.png']);
+    _createTable();
+    _createHeaderText();
+    _createGameTimer();
+
+    card1Val = await Card.generateRandomCard(images);
+    guessCardVal = await Card.generateRandomCard(images);
+    card2Val = await Card.generateRandomCard(images);
+
+    await _createPlayers();
+    await _createZoomedCards();
+    await _createZoomedCardHolders();
+    await _createMoneyHolder();
+  }
+
+  // Background setup
+  Future<void> _createBackground() async {
     final backgroundSprite = await loadSprite('background.png');
     final background = SpriteComponent(
       sprite: backgroundSprite,
@@ -54,20 +83,9 @@ class MyGame extends FlameGame {
       priority: -1,
     );
     await add(background);
-
-    startGame();
   }
 
-  void startGame() async {
-    _createTable();
-    _createHeaderText();
-    _createGameTimer();
-    await _createPlayers();
-    await _createZoomedCards();
-    await _createZoomedCardHolders();
-    await _createMoneyHolder();
-  }
-
+  // UI Header
   Future<void> _createHeaderText() async {
     headerText = HeaderText(
       userName: "JM",
@@ -76,6 +94,7 @@ class MyGame extends FlameGame {
     add(headerText);
   }
 
+  // Timer setup
   Future<void> _createGameTimer() async {
     final background = SpriteComponent(
       sprite: await loadSprite('timer_bg.png'),
@@ -89,7 +108,6 @@ class MyGame extends FlameGame {
 
     gameTimer = GameTimer(
       sprites: timerSprites,
-      //spriteComponent: SpriteComponent(size: Vector2(100, 100)),
       backgroundSprite: background,
       position: Vector2(size.x - 150, 30),
     );
@@ -97,47 +115,48 @@ class MyGame extends FlameGame {
     add(gameTimer);
   }
 
+  // Player setup
   Future<void> _createPlayers() async {
     playerMaps = {};
     final card1 = Card(
       suit: "Spades",
       value: "4",
-      imagePath: 'cards/clubs_4.png',
+      front: Sprite(await Flame.images.load('cards/clubs_2.png')),
+      back: Sprite(await Flame.images.load('cards/other_back_red.png')),
     );
-    for (int i = 0; i <= playersCount; i++) {
+
+    for (int i = 0; i < playersCount; i++) {
+      angle = _calculatePlayerAngle(i);
+
       playerMaps['player$i'] = Player(
+        position: tableCoordinates[i],
         userName: "player$i",
         card1: card1,
         card2: card1,
+        angle: angle,
+        guessCard: card1,
       );
 
       add(playerMaps['player$i']!);
     }
   }
 
-  Future<void> _createZoomedCards() async {
-    final frontSprite = await loadSprite('cards/clubs_2.png');
-    //final _yPosition = size.x / 2 - 420;
-
-    card1 = GameCard(
-      frontSprite: frontSprite,
-      //position: Vector2(_yPosition, (size.y * 0.1 - 20)),
-      size: Vector2(70, 90),
-    );
-
-    guessCard = GameCard(
-      frontSprite: frontSprite,
-      //position: Vector2(_yPosition, (size.y * 0.1) + 120 + 10),
-      size: Vector2(70, 90),
-    );
-
-    card2 = GameCard(
-      frontSprite: frontSprite,
-      //position: Vector2(_yPosition, (size.y * 0.1) + 230 + 10 + 10),
-      size: Vector2(70, 90),
-    );
+  // determine playe position on table
+  double _calculatePlayerAngle(int index) {
+    if (index == 2) return 270 * (3.14159265 / 180);
+    if (index == 3 || index == 4) return 180 * (3.14159265 / 180);
+    if (index == 5) return 90 * (3.14159265 / 180);
+    return 0;
   }
 
+  // Creating the zoomed-in game cards
+  Future<void> _createZoomedCards() async {
+    card1 = GameCard(size: Vector2(70, 90), card: card1Val);
+    guessCard = GameCard(size: Vector2(70, 90), card: guessCardVal);
+    card2 = GameCard(size: Vector2(70, 90), card: card2Val);
+  }
+
+  //zoomed-in card holders
   Future<void> _createZoomedCardHolders() async {
     shadowSprite = await loadSprite('cards/card_shadow.png');
     guessSprite = await loadSprite('cards/question_card.png');
@@ -170,25 +189,86 @@ class MyGame extends FlameGame {
     add(cardHolder2);
   }
 
+  //money holder
   Future<void> _createMoneyHolder() async {
     final moneyHolderSprite = await loadSprite('holders/amount_holder.png');
-    final _yPosition = size.x / 2 - 460;
+    final yPosition = size.x / 2 - 460;
+
     moneyHolder = MoneyHolder(
       bg: moneyHolderSprite,
-      position: Vector2(_yPosition, size.y / 2 + 120),
+      position: Vector2(yPosition, size.y / 2 + 120),
       size: Vector2(180, 80),
     );
 
     add(moneyHolder);
   }
 
+  //game table
   void _createTable() {
     table = Table(position: Vector2(size.x / 2, size.y / 2));
     add(table);
   }
 
+  // Funcation for timer completion
   void timerEnded() {
+    guessCard.startFlip();
     card1.startFlip();
     card2.startFlip();
+    print(
+      compareGuessToRange(
+        card1: card1Val,
+        card2: card2Val,
+        guessCard: guessCardVal,
+      ),
+    );
+  }
+
+  String compareGuessToRange({
+    required Card card1,
+    required Card card2,
+    required Card guessCard,
+  }) {
+    final List<String> order = [
+      'ace',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+      'jack',
+      'queen',
+      'king',
+    ];
+
+    int val1 = order.indexOf(card1.value);
+    int val2 = order.indexOf(card2.value);
+    int guessVal = order.indexOf(guessCard.value);
+
+    if (val1 == -1 || val2 == -1 || guessVal == -1) {
+      throw ArgumentError('Invalid card value');
+    }
+
+    if (val1 == val2) {
+      if (guessVal > val1) {
+        return 'higher';
+      } else if (guessVal < val1) {
+        return 'lower';
+      } else {
+        return 'equal';
+      }
+    }
+
+    int minVal = val1 < val2 ? val1 : val2;
+    int maxVal = val1 > val2 ? val1 : val2;
+
+    if (guessVal > minVal && guessVal < maxVal) {
+      return 'in between';
+    } else {
+      return 'not in between';
+    }
   }
 }

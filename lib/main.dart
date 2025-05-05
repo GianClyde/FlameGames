@@ -3,6 +3,6 @@ import 'package:flame_practice/game.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  final MyGame game = MyGame(playersCount: 1);
+  final MyGame game = MyGame(playersCount: 6);
   runApp(GameWidget(game: game));
 }
