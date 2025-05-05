@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:flame/timer.dart';
+import 'package:flutter/material.dart';
 import 'package:flame_practice/game.dart';
 
-class GameTimer extends PositionComponent with HasGameReference<MyGame> {
+class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
   final List<Sprite> sprites;
   final SpriteComponent backgroundSprite;
   final double tickDuration;
@@ -13,7 +16,7 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
   late SpriteComponent tensSprite;
   late SpriteComponent onesSprite;
 
-  GameTimer({
+  GameOverlayTimer({
     required this.backgroundSprite,
     required this.sprites,
     this.tickDuration = 1.0,
@@ -32,15 +35,23 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
       throw Exception("No valid sprites found for GameTimer.");
     }
 
+    final overlayBackground = RectangleComponent(
+      size: size,
+      // ignore: deprecated_member_use
+      paint: Paint()..color = Colors.black.withOpacity(0.6),
+    );
+
+    add(overlayBackground);
+
     tensSprite = SpriteComponent(size: Vector2(30, 40));
     onesSprite = SpriteComponent(size: Vector2(30, 40));
 
-    tensSprite.position = Vector2(20, 30);
-    onesSprite.position = Vector2(50, 30);
+    tensSprite.position = Vector2(size.x / 2 - 30, size.y / 2);
+    onesSprite.position = Vector2(size.x / 2 + 10, size.y / 2);
 
     _updateNumberSprites(_currentTick);
 
-    add(backgroundSprite);
+    //add(backgroundSprite);
     add(tensSprite);
     add(onesSprite);
   }
@@ -48,9 +59,7 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
   @override
   void update(double dt) {
     super.update(dt);
-    if (_timer.isRunning()) {
-      _timer.update(dt);
-    }
+    _timer.update(dt);
   }
 
   void _updateSprite() {
@@ -59,15 +68,12 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
       _updateNumberSprites(_currentTick);
     } else {
       _timer.stop();
-      game.timerEnded();
+      //game.timerEnded();
+      removeFromParent();
     }
   }
 
-  void start() {
-    if (!_timer.isRunning()) {
-      _timer.start();
-    }
-  }
+  void start() => _timer.start();
 
   void _updateNumberSprites(int number) {
     final tens = number ~/ 10;

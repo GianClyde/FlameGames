@@ -3,6 +3,7 @@ import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flame_practice/components/beginning_timer_overlay.dart';
 import 'package:flame_practice/components/card_holder.dart';
 import 'package:flame_practice/components/game_card.dart';
 import 'package:flame_practice/components/game_timer.dart';
@@ -36,6 +37,11 @@ class MyGame extends FlameGame {
 
   late final Images images;
 
+  late List<Sprite> timerSprites;
+
+  //beginning overlay
+  late GameOverlayTimer _startingGameOverlayTimer;
+
   // Predefined table positions for players
   final List<Vector2> tableCoordinates = [
     Vector2(320, 260),
@@ -59,11 +65,16 @@ class MyGame extends FlameGame {
 
   // Initializes the game setup
   void startGame() async {
+    timerSprites = [];
+    for (int i = 0; i <= 9; i++) {
+      timerSprites.add(await loadSprite('numbers/$i.png'));
+    }
+
     await images.loadAll(['cards/other_back_red.png']);
     _createTable();
     _createHeaderText();
     _createGameTimer();
-
+    _createStartCountdown();
     card1Val = await Card.generateRandomCard(images);
     guessCardVal = await Card.generateRandomCard(images);
     card2Val = await Card.generateRandomCard(images);
@@ -94,17 +105,25 @@ class MyGame extends FlameGame {
     add(headerText);
   }
 
+  //Crete beginning overlay
+  Future<void> _createStartCountdown() async {
+    _startingGameOverlayTimer = GameOverlayTimer(
+      backgroundSprite: SpriteComponent(
+        sprite: await loadSprite('timer_bg.png'),
+        size: Vector2(100, 100),
+      ),
+      sprites: timerSprites,
+    );
+
+    add(_startingGameOverlayTimer);
+  }
+
   // Timer setup
   Future<void> _createGameTimer() async {
     final background = SpriteComponent(
       sprite: await loadSprite('timer_bg.png'),
       size: Vector2(100, 100),
     );
-
-    List<Sprite> timerSprites = [];
-    for (int i = 0; i <= 9; i++) {
-      timerSprites.add(await loadSprite('numbers/$i.png'));
-    }
 
     gameTimer = GameTimer(
       sprites: timerSprites,
