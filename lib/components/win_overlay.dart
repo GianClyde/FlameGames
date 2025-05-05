@@ -6,13 +6,22 @@ import 'package:flame_practice/game.dart';
 class WinOverlay extends PositionComponent with HasGameReference<MyGame> {
   late TextComponent textLabel;
   late Timer _timer;
+  late String result;
 
-  WinOverlay({super.position, super.size, super.priority}) {
-    _timer = Timer(
-      5.0,
-      onTick: _removeOverlay,
-      autoStart: true,
-    ); // 5-second timer
+  final bool isWinner;
+
+  WinOverlay({
+    required this.isWinner,
+    super.position,
+    super.size,
+    super.priority,
+  }) {
+    _timer = Timer(5.0, onTick: _removeOverlay, autoStart: true);
+    if (isWinner) {
+      result = "WIN";
+    } else {
+      result = "LOSE";
+    }
   }
 
   @override
@@ -28,7 +37,7 @@ class WinOverlay extends PositionComponent with HasGameReference<MyGame> {
     add(overlayBackground);
 
     textLabel = TextComponent(
-      text: 'YOU WIN!',
+      text: result,
       textRenderer: TextPaint(
         style: const TextStyle(
           fontSize: 40,
@@ -45,10 +54,10 @@ class WinOverlay extends PositionComponent with HasGameReference<MyGame> {
   @override
   void update(double dt) {
     super.update(dt);
-    _timer.update(dt); // Update timer each frame
+    _timer.update(dt);
   }
 
   void _removeOverlay() {
-    removeFromParent(); // Remove the overlay after 5 seconds
+    removeFromParent();
   }
 }

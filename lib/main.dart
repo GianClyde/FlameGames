@@ -1,6 +1,5 @@
 import 'package:flame/game.dart';
 import 'package:flame_practice/game.dart';
-import 'package:flame_practice/models/card.dart';
 import 'package:flame_practice/models/player.dart';
 import 'package:flame_practice/models/room.dart';
 import 'package:flutter/widgets.dart';

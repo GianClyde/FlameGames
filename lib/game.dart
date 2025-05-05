@@ -136,6 +136,7 @@ class MyGame extends FlameGame {
       size: size,
       position: Vector2.zero(),
       priority: 12,
+      isWinner: checkResults(bet: "in between"),
     );
     add(winOverlay);
   }
@@ -280,9 +281,7 @@ class MyGame extends FlameGame {
     if (gameTimer.hasEnded) {
       isWinner = checkResults(bet: "not in between");
       print("REsult:  $isWinner");
-      if (isWinner) {
-        _createWinnerOverlay();
-      } else {}
+      _createWinnerOverlay();
     }
 
     startIntervalTimer();
