@@ -12,6 +12,7 @@ import 'package:flame_practice/components/money_holder.dart';
 import 'package:flame_practice/components/player.dart';
 import 'package:flame_practice/components/table.dart';
 import 'package:flame_practice/models/card.dart';
+import 'package:flame_practice/models/room.dart';
 
 class MyGame extends FlameGame {
   // Core game components
@@ -32,7 +33,7 @@ class MyGame extends FlameGame {
 
   // Player-related properties
   late Map<String, Player> playerMaps;
-  final int playersCount;
+  final Room room;
   late double angle;
 
   late final Images images;
@@ -52,7 +53,10 @@ class MyGame extends FlameGame {
     Vector2(275, 160),
   ];
 
-  MyGame({required this.playersCount});
+  //result
+  late String cardResult;
+
+  MyGame({super.children, super.world, super.camera, required this.room});
 
   @override
   Future<void> onLoad() async {
@@ -108,7 +112,8 @@ class MyGame extends FlameGame {
   //Crete beginning overlay
   Future<void> _createStartCountdown() async {
     _startingGameOverlayTimer = GameOverlayTimer(
-      position: Vector2(size.x, size.y),
+      size: size,
+      position: Vector2.zero(),
       priority: 12,
       backgroundSprite: SpriteComponent(
         sprite: await loadSprite('timer_bg.png'),
@@ -146,7 +151,7 @@ class MyGame extends FlameGame {
       back: Sprite(await Flame.images.load('cards/other_back_red.png')),
     );
 
-    for (int i = 0; i < playersCount; i++) {
+    for (int i = 0; i < room.listPlayers.length; i++) {
       angle = _calculatePlayerAngle(i);
 
       playerMaps['player$i'] = Player(
@@ -182,25 +187,26 @@ class MyGame extends FlameGame {
     shadowSprite = await loadSprite('cards/card_shadow.png');
     guessSprite = await loadSprite('cards/question_card.png');
 
-    final _yPosition = size.x / 2 - 420;
+    final yPosition = size.x / 2 - 420;
 
     cardHolder1 = CardHolder(
       holderSprite: shadowSprite,
-      position: Vector2(_yPosition, (size.y * 0.1 - 20)),
+      position: Vector2(yPosition, (size.y * 0.1 - 20)),
       size: Vector2(105, 120),
       generatedGameCard: card1,
     );
 
     guessCardHolder = CardHolder(
       holderSprite: guessSprite,
-      position: Vector2(_yPosition, (size.y * 0.1 - 20) + 95 + 10),
+      position: Vector2(yPosition, (size.y * 0.1 - 20) + 95 + 10),
       size: Vector2(105, 120),
       generatedGameCard: guessCard,
+      isGuessCard: true,
     );
 
     cardHolder2 = CardHolder(
       holderSprite: shadowSprite,
-      position: Vector2(_yPosition, (size.y * 0.1 - 20) + 190 + 10 + 10),
+      position: Vector2(yPosition, (size.y * 0.1 - 20) + 190 + 10 + 10),
       size: Vector2(105, 120),
       generatedGameCard: card2,
     );
@@ -235,17 +241,26 @@ class MyGame extends FlameGame {
     guessCard.startFlip();
     card1.startFlip();
     card2.startFlip();
-    print(
-      compareGuessToRange(
-        card1: card1Val,
-        card2: card2Val,
-        guessCard: guessCardVal,
-      ),
-    );
+
+    gameFlow();
   }
 
   void beginningTimerEnded() {
     gameTimer.start();
+  }
+
+  Future<void> gameFlow() async {
+    if (gameTimer.hasEnded) {
+      cardResult = compareGuessToRange(
+        card1: card1Val,
+        card2: card2Val,
+        guessCard: guessCardVal,
+      );
+    }
+
+    gameTimer.reset();
+
+    print(cardResult);
   }
 
   String compareGuessToRange({

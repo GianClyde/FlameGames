@@ -20,7 +20,7 @@ class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
     required this.backgroundSprite,
     required this.sprites,
     this.tickDuration = 1.0,
-    this.startTime = 10,
+    this.startTime = 3,
     super.position,
     super.size,
     super.priority,
@@ -45,7 +45,7 @@ class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
     final overlayBackground = RectangleComponent(
       size: size,
       position: Vector2.zero(),
-      priority: 12,
+      priority: -1,
       // ignore: deprecated_member_use
       paint: Paint()..color = Colors.black.withOpacity(0.6),
     );

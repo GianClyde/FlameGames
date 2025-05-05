@@ -8,6 +8,7 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
   final int startTime;
 
   late Timer _timer;
+  late bool hasEnded = false;
   int _currentTick;
 
   late SpriteComponent tensSprite;
@@ -17,7 +18,7 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
     required this.backgroundSprite,
     required this.sprites,
     this.tickDuration = 1.0,
-    this.startTime = 20,
+    this.startTime = 10,
     super.position,
     super.size,
   }) : _currentTick = startTime {
@@ -63,6 +64,7 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
       _currentTick--;
       _updateNumberSprites(_currentTick);
     } else {
+      hasEnded = true;
       _timer.stop();
       game.timerEnded();
     }
@@ -70,11 +72,13 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
 
   void start() {
     if (!_timer.isRunning()) {
+      hasEnded = false;
       _timer.start();
     }
   }
 
   void reset() {
+    hasEnded = false;
     _currentTick = startTime;
     _updateNumberSprites(_currentTick);
     _timer.stop();
