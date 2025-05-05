@@ -11,7 +11,9 @@ import 'package:flame_practice/components/header_text.dart';
 import 'package:flame_practice/components/money_holder.dart';
 import 'package:flame_practice/components/player.dart';
 import 'package:flame_practice/components/table.dart';
+import 'package:flame_practice/components/win_overlay.dart';
 import 'package:flame_practice/models/card.dart';
+import 'package:flame_practice/models/player.dart';
 import 'package:flame_practice/models/room.dart';
 
 class MyGame extends FlameGame {
@@ -35,13 +37,16 @@ class MyGame extends FlameGame {
   late Map<String, Player> playerMaps;
   final Room room;
   late double angle;
-
+  late PlayerModel activePlayer;
+  late int currentPlayerIndex;
   late final Images images;
 
   late List<Sprite> timerSprites;
 
   //beginning overlay
   late GameOverlayTimer _startingGameOverlayTimer;
+
+  //winner overlay
 
   // Predefined table positions for players
   final List<Vector2> tableCoordinates = [
@@ -55,6 +60,7 @@ class MyGame extends FlameGame {
 
   //result
   late String cardResult;
+  late bool isWinner;
 
   MyGame({super.children, super.world, super.camera, required this.room});
 
@@ -109,7 +115,7 @@ class MyGame extends FlameGame {
     add(headerText);
   }
 
-  //Crete beginning overlay
+  //Create beginning overlay
   Future<void> _createStartCountdown() async {
     _startingGameOverlayTimer = GameOverlayTimer(
       size: size,
@@ -123,6 +129,15 @@ class MyGame extends FlameGame {
     );
 
     add(_startingGameOverlayTimer);
+  }
+
+  Future<void> _createWinnerOverlay() async {
+    final WinOverlay winOverlay = WinOverlay(
+      size: size,
+      position: Vector2.zero(),
+      priority: 12,
+    );
+    add(winOverlay);
   }
 
   // Timer setup
@@ -161,7 +176,9 @@ class MyGame extends FlameGame {
         card2: card1,
         angle: angle,
         guessCard: card1,
+        playerModel: room.listPlayers[i],
       );
+      activePlayer = room.listPlayers[0];
 
       add(playerMaps['player$i']!);
     }
@@ -249,18 +266,51 @@ class MyGame extends FlameGame {
     gameTimer.start();
   }
 
-  Future<void> gameFlow() async {
-    if (gameTimer.hasEnded) {
-      cardResult = compareGuessToRange(
-        card1: card1Val,
-        card2: card2Val,
-        guessCard: guessCardVal,
-      );
-    }
+  //call in gameflow
+  Future<void> switchToNextPlayer() async {
+    currentPlayerIndex = (currentPlayerIndex + 1) % room.listPlayers.length;
+    activePlayer = room.listPlayers[currentPlayerIndex];
+
+    print("active player: ${activePlayer.user}");
 
     gameTimer.reset();
+  }
 
-    print(cardResult);
+  Future<void> gameFlow() async {
+    if (gameTimer.hasEnded) {
+      isWinner = checkResults(bet: "not in between");
+      print("REsult:  $isWinner");
+      if (isWinner) {
+        _createWinnerOverlay();
+      } else {}
+    }
+
+    startIntervalTimer();
+  }
+
+  void startIntervalTimer() {
+    TimerComponent intervalTimer = TimerComponent(
+      period: 5,
+      removeOnFinish: true,
+      onTick: () {
+        gameTimer.start();
+      },
+    );
+    add(intervalTimer);
+  }
+
+  bool checkResults({required String bet}) {
+    final String cardResult = compareGuessToRange(
+      card1: card1Val,
+      card2: card2Val,
+      guessCard: guessCardVal,
+    );
+    print("card result: ${cardResult} bet: ${bet}");
+    if (bet == cardResult) {
+      return true;
+    }
+
+    return false;
   }
 
   String compareGuessToRange({

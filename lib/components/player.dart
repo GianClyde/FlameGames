@@ -5,8 +5,10 @@ import 'package:flame/flame.dart';
 import 'package:flame_practice/components/game_card.dart';
 import 'package:flame_practice/game.dart';
 import 'package:flame_practice/models/card.dart';
+import 'package:flame_practice/models/player.dart';
 
 class Player extends PositionComponent with HasGameReference<MyGame> {
+  final PlayerModel playerModel;
   final String userName;
   final Card? card1;
   final Card? card2;
@@ -21,6 +23,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
   late String frontImagePath;
 
   Player({
+    required this.playerModel,
     super.size,
     super.children,
     super.position,
