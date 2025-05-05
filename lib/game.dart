@@ -172,12 +172,11 @@ class MyGame extends FlameGame {
 
       playerMaps['player$i'] = Player(
         position: tableCoordinates[i],
-        userName: "player$i",
         card1: card1,
         card2: card1,
         angle: angle,
         guessCard: card1,
-        playerModel: room.listPlayers[i],
+        player: room.listPlayers[i],
       );
       activePlayer = room.listPlayers[0];
 
@@ -296,6 +295,8 @@ class MyGame extends FlameGame {
       onTick: () {
         hasShownWinnerOverlay = false;
         switchToNextPlayer();
+        card1.startFlip();
+        card2.startFlip();
         gameTimer.start();
       },
     );
