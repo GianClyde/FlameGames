@@ -56,6 +56,8 @@ class MyGame extends FlameGame {
     Vector2(275, 160),
   ];
 
+  //TODO link active player cards to cardVal 1 and 2
+
   // Result tracking
   late String cardResult;
   late bool isWinner;
@@ -292,9 +294,21 @@ class MyGame extends FlameGame {
     TimerComponent intervalTimer = TimerComponent(
       period: period,
       removeOnFinish: true,
-      onTick: () {
+      onTick: () async {
         hasShownWinnerOverlay = false;
         switchToNextPlayer();
+
+        // Regenerate card values
+        card1Val = await Card.generateRandomCard(images);
+        guessCardVal = await Card.generateRandomCard(images);
+        card2Val = await Card.generateRandomCard(images);
+
+        // Update GameCards with new data
+        await card1.updateCard(card1Val);
+        await guessCard.updateCard(guessCardVal);
+        await card2.updateCard(card2Val);
+
+        // Start the next round
         card1.startFlip();
         card2.startFlip();
         gameTimer.start();

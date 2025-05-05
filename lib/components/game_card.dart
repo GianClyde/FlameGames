@@ -6,7 +6,7 @@ import 'package:flame_practice/models/card.dart';
 class GameCard extends PositionComponent with HasGameReference<MyGame> {
   late SpriteComponent front;
   late SpriteComponent back;
-  final Card card;
+  late Card card;
   bool isFlipped = false;
 
   GameCard({required this.card, super.position, super.scale, Vector2? size})
@@ -16,8 +16,7 @@ class GameCard extends PositionComponent with HasGameReference<MyGame> {
   Future<void> onLoad() async {
     front = SpriteComponent(sprite: card.front, size: size);
     back = SpriteComponent(sprite: card.back, size: size);
-
-    await add(back); // Start with the back showing
+    await add(back);
   }
 
   void startFlip() {
@@ -28,12 +27,8 @@ class GameCard extends PositionComponent with HasGameReference<MyGame> {
         Vector2(0, 1),
         EffectController(duration: 0.3),
         onComplete: () async {
-          if (contains(back)) {
-            remove(back);
-          }
-          if (!contains(front)) {
-            await add(front);
-          }
+          if (contains(back)) remove(back);
+          if (!contains(front)) await add(front);
           add(ScaleEffect.to(Vector2(1, 1), EffectController(duration: 0.3)));
           isFlipped = true;
         },
@@ -49,16 +44,25 @@ class GameCard extends PositionComponent with HasGameReference<MyGame> {
         Vector2(0, 1),
         EffectController(duration: 0.3),
         onComplete: () async {
-          if (contains(front)) {
-            remove(front);
-          }
-          if (!contains(back)) {
-            await add(back);
-          }
+          if (contains(front)) remove(front);
+          if (!contains(back)) await add(back);
           add(ScaleEffect.to(Vector2(1, 1), EffectController(duration: 0.3)));
           isFlipped = false;
         },
       ),
     );
+  }
+
+  Future<void> updateCard(Card newCard) async {
+    card = newCard;
+
+    if (contains(front)) remove(front);
+    if (contains(back)) remove(back);
+
+    front = SpriteComponent(sprite: newCard.front, size: size);
+    back = SpriteComponent(sprite: newCard.back, size: size);
+
+    await add(back);
+    isFlipped = false;
   }
 }
