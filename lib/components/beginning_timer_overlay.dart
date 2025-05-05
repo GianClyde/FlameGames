@@ -20,7 +20,7 @@ class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
     required this.backgroundSprite,
     required this.sprites,
     this.tickDuration = 1.0,
-    this.startTime = 20,
+    this.startTime = 10,
     super.position,
     super.size,
   }) : _currentTick = startTime {
@@ -68,7 +68,7 @@ class GameOverlayTimer extends PositionComponent with HasGameReference<MyGame> {
       _updateNumberSprites(_currentTick);
     } else {
       _timer.stop();
-      //game.timerEnded();
+      game.beginningTimerEnded();
       removeFromParent();
     }
   }

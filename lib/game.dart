@@ -242,6 +242,10 @@ class MyGame extends FlameGame {
     );
   }
 
+  void beginningTimerEnded() {
+    gameTimer.start();
+  }
+
   String compareGuessToRange({
     required Card card1,
     required Card card2,

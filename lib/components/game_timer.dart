@@ -21,7 +21,12 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
     super.position,
     super.size,
   }) : _currentTick = startTime {
-    _timer = Timer(tickDuration, onTick: _updateSprite, repeat: true);
+    _timer = Timer(
+      tickDuration,
+      onTick: _updateSprite,
+      repeat: true,
+      autoStart: false,
+    );
   }
 
   @override
@@ -67,6 +72,12 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
     if (!_timer.isRunning()) {
       _timer.start();
     }
+  }
+
+  void reset() {
+    _currentTick = startTime;
+    _updateNumberSprites(_currentTick);
+    _timer.stop();
   }
 
   void _updateNumberSprites(int number) {
