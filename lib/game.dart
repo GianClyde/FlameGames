@@ -297,9 +297,12 @@ class MyGame extends FlameGame {
   }
 
   Future<void> switchToNextPlayer() async {
+    activePlayer.setTurn(false);
+
     currentPlayerIndex = (currentPlayerIndex + 1) % room.userList.length;
     activePlayer = playerMaps["player$currentPlayerIndex"]!;
 
+    activePlayer.setTurn(true);
     gameTimer.reset();
   }
 

@@ -18,7 +18,7 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
     required this.backgroundSprite,
     required this.sprites,
     this.tickDuration = 1.0,
-    this.startTime = 20,
+    this.startTime = 5,
     super.position,
     super.size,
   }) : _currentTick = startTime {

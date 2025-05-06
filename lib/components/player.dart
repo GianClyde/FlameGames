@@ -43,14 +43,11 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
   @override
   FutureOr<void> onLoad() async {
     playerTurnArrow = PlayerTurnArrow(
-      isTurn: turn,
       size: Vector2(200, 200),
       position: Vector2(size.x / 2, size.y / 2),
     );
 
-    if (turn) {
-      add(playerTurnArrow);
-    }
+    await add(playerTurnArrow);
 
     frontImagePath = 'cards/clubs_2.png';
     userName = TextComponent(
@@ -123,5 +120,14 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     add(gameGuessCard!);
     add(gameCard2!);
     return super.onLoad();
+  }
+
+  void setTurn(bool isActive) {
+    turn = isActive;
+    if (!isActive) {
+      playerTurnArrow.show();
+    } else {
+      playerTurnArrow.hide();
+    }
   }
 }
