@@ -5,6 +5,7 @@ import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame_practice/components/beginning_timer_overlay.dart';
 import 'package:flame_practice/components/card_holder.dart';
+import 'package:flame_practice/components/deck_manager.dart';
 import 'package:flame_practice/components/game_card.dart';
 import 'package:flame_practice/components/game_timer.dart';
 import 'package:flame_practice/components/header_text.dart';
@@ -45,6 +46,12 @@ class MyGame extends FlameGame {
   //beginning overlay
   late GameOverlayTimer _startingGameOverlayTimer;
 
+  //deck manager related
+  late DeckManager deckManager;
+  late Card playerCard1;
+  late Card playerGuessCard;
+  late Card playerCard2;
+
   // Predefined table positions for players
   final List<Vector2> tableCoordinates = [
     Vector2(320, 260),
@@ -79,17 +86,21 @@ class MyGame extends FlameGame {
       timerSprites.add(await loadSprite('numbers/$i.png'));
     }
 
+    deckManager = DeckManager();
+    await deckManager.load();
+
     await images.loadAll(['cards/other_back_red.png']);
     _createTable();
-    _createHeaderText();
+
     _createGameTimer();
     _createStartCountdown();
 
-    card1Val = await Card.generateRandomCard(images);
-    guessCardVal = await Card.generateRandomCard(images);
-    card2Val = await Card.generateRandomCard(images);
-
     await _createPlayers();
+    await _createHeaderText();
+    card1Val = activePlayer.card1!;
+    guessCardVal = activePlayer.guessCard!;
+    card2Val = activePlayer.card2!;
+    print("Active player: ${activePlayer.user.userName}");
     await _createZoomedCards();
     await _createZoomedCardHolders();
     await _createMoneyHolder();
@@ -107,7 +118,7 @@ class MyGame extends FlameGame {
 
   Future<void> _createHeaderText() async {
     headerText = HeaderText(
-      userName: "JM",
+      userName: activePlayer.user.userName,
       position: Vector2((size.x / 2) - 50, 30),
     );
     add(headerText);
@@ -161,22 +172,20 @@ class MyGame extends FlameGame {
 
   Future<void> _createPlayers() async {
     playerMaps = {};
-    final card1 = Card(
-      suit: "Spades",
-      value: "4",
-      front: Sprite(await Flame.images.load('cards/clubs_2.png')),
-      back: Sprite(await Flame.images.load('cards/other_back_red.png')),
-    );
+
+    playerCard1 = deckManager.drawCard();
+    playerCard2 = deckManager.drawCard();
+    playerGuessCard = deckManager.drawCard();
 
     for (int i = 0; i < room.userList.length; i++) {
       angle = _calculatePlayerAngle(i);
 
       playerMaps['player$i'] = Player(
         position: tableCoordinates[i],
-        card1: card1,
-        card2: card1,
+        card1: playerCard1,
+        card2: playerCard2,
         angle: angle,
-        guessCard: card1,
+        guessCard: playerGuessCard,
         user: room.userList[i],
       );
 
@@ -262,7 +271,6 @@ class MyGame extends FlameGame {
     currentPlayerIndex = (currentPlayerIndex + 1) % room.userList.length;
     activePlayer = playerMaps["player$currentPlayerIndex"]!;
 
-    print("Active player: ${activePlayer.user.userName}");
     gameTimer.reset();
   }
 
