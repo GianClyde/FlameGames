@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
-import 'package:flutter/material.dart';
 
 class BettingButtons extends SpriteButtonComponent {
   final Sprite normal;

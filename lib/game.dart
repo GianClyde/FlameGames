@@ -12,6 +12,7 @@ import 'package:flame_practice/components/game_timer.dart';
 import 'package:flame_practice/components/header_text.dart';
 import 'package:flame_practice/components/money_holder.dart';
 import 'package:flame_practice/components/player.dart';
+import 'package:flame_practice/components/slider.dart';
 import 'package:flame_practice/components/table.dart';
 import 'package:flame_practice/components/win_overlay.dart';
 import 'package:flame_practice/models/card.dart';
@@ -72,6 +73,9 @@ class MyGame extends FlameGame {
   late bool isWinner;
   bool hasShownWinnerOverlay = false;
 
+  //slider
+  late SliderComponent slider;
+
   MyGame({super.children, super.world, super.camera, required this.room});
 
   @override
@@ -110,6 +114,17 @@ class MyGame extends FlameGame {
     await _createZoomedCardHolders();
     await _createMoneyHolder();
     await _creatBettingButtons();
+    await _createSlider();
+  }
+
+  Future<void> _createSlider() async {
+    slider = SliderComponent(
+      sliderWidth: 200,
+      onChanged: (value) {
+        print("SLIDER: $value");
+      },
+    );
+    add(slider);
   }
 
   Future<void> _createBackground() async {
