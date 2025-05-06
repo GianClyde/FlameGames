@@ -13,7 +13,6 @@ import 'package:flame_practice/components/player.dart';
 import 'package:flame_practice/components/table.dart';
 import 'package:flame_practice/components/win_overlay.dart';
 import 'package:flame_practice/models/card.dart';
-import 'package:flame_practice/models/player.dart';
 import 'package:flame_practice/models/room.dart';
 
 class MyGame extends FlameGame {
@@ -37,7 +36,7 @@ class MyGame extends FlameGame {
   late Map<String, Player> playerMaps;
   final Room room;
   late double angle;
-  late PlayerModel activePlayer;
+  late Player activePlayer;
   int currentPlayerIndex = 0;
   late final Images images;
 
@@ -169,7 +168,7 @@ class MyGame extends FlameGame {
       back: Sprite(await Flame.images.load('cards/other_back_red.png')),
     );
 
-    for (int i = 0; i < room.listPlayers.length; i++) {
+    for (int i = 0; i < room.userList.length; i++) {
       angle = _calculatePlayerAngle(i);
 
       playerMaps['player$i'] = Player(
@@ -178,12 +177,13 @@ class MyGame extends FlameGame {
         card2: card1,
         angle: angle,
         guessCard: card1,
-        player: room.listPlayers[i],
+        user: room.userList[i],
       );
-      activePlayer = room.listPlayers[0];
 
       add(playerMaps['player$i']!);
     }
+
+    activePlayer = playerMaps["player0"]!;
   }
 
   double _calculatePlayerAngle(int index) {
@@ -259,10 +259,10 @@ class MyGame extends FlameGame {
   }
 
   Future<void> switchToNextPlayer() async {
-    currentPlayerIndex = (currentPlayerIndex + 1) % room.listPlayers.length;
-    activePlayer = room.listPlayers[currentPlayerIndex];
+    currentPlayerIndex = (currentPlayerIndex + 1) % room.userList.length;
+    activePlayer = playerMaps["player$currentPlayerIndex"]!;
 
-    print("Active player: ${activePlayer.user}");
+    print("Active player: ${activePlayer.user.userName}");
     gameTimer.reset();
   }
 

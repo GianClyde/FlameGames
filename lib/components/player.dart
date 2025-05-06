@@ -7,12 +7,13 @@ import 'package:flame_practice/components/game_card.dart';
 import 'package:flame_practice/game.dart';
 import 'package:flame_practice/models/card.dart';
 import 'package:flame_practice/models/player.dart';
+import 'package:flame_practice/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flame_practice/models/card.dart' as game_card;
 import 'package:flutter/material.dart';
 
 class Player extends PositionComponent with HasGameReference<MyGame> {
-  final PlayerModel player;
+  final User user;
   final game_card.Card? card1;
   final game_card.Card? card2;
   final game_card.Card? guessCard;
@@ -28,7 +29,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
   late String frontImagePath;
 
   Player({
-    required this.player,
+    required this.user,
     super.size,
     super.children,
     super.position,
@@ -45,7 +46,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
   FutureOr<void> onLoad() async {
     frontImagePath = 'cards/clubs_2.png';
     userName = TextComponent(
-      text: player.user,
+      text: user.userName,
       textRenderer: TextPaint(
         style: const TextStyle(
           fontSize: 12,

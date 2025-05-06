@@ -1,8 +1,8 @@
-import 'package:flame_practice/models/player.dart';
+import 'package:flame_practice/models/user.dart';
 
 class Room {
   final String roomId;
-  final List<PlayerModel> listPlayers;
+  final List<User> userList;
 
-  Room({required this.roomId, required this.listPlayers});
+  Room({required this.roomId, required this.userList});
 }
