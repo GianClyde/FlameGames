@@ -9,18 +9,23 @@ class WinOverlay extends PositionComponent with HasGameReference<MyGame> {
   late String result;
 
   final bool isWinner;
-
+  final bool hasFolded;
   WinOverlay({
+    this.hasFolded = false,
     required this.isWinner,
     super.position,
     super.size,
     super.priority,
   }) {
     _timer = Timer(5.0, onTick: _removeOverlay, autoStart: true);
-    if (isWinner) {
-      result = "WIN";
+    if (hasFolded) {
+      result = "FOLDED";
     } else {
-      result = "LOSE";
+      if (isWinner) {
+        result = "WIN";
+      } else {
+        result = "LOSE";
+      }
     }
   }
 

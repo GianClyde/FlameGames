@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame_practice/components/game_card.dart';
+import 'package:flame_practice/components/player_turn_arrow.dart';
 import 'package:flame_practice/game.dart';
 import 'package:flame_practice/models/user.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,8 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
 
   late TextComponent userName;
 
-  late bool turn;
+  bool turn = false;
+  late PlayerTurnArrow playerTurnArrow;
 
   late String frontImagePath;
 
@@ -40,6 +42,16 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
 
   @override
   FutureOr<void> onLoad() async {
+    playerTurnArrow = PlayerTurnArrow(
+      isTurn: turn,
+      size: Vector2(200, 200),
+      position: Vector2(size.x / 2, size.y / 2),
+    );
+
+    if (turn) {
+      add(playerTurnArrow);
+    }
+
     frontImagePath = 'cards/clubs_2.png';
     userName = TextComponent(
       text: user.userName,

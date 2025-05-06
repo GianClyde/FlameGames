@@ -91,4 +91,11 @@ class GameTimer extends PositionComponent with HasGameReference<MyGame> {
     tensSprite.sprite = sprites[tens];
     onesSprite.sprite = sprites[ones];
   }
+
+  void stop() {
+    if (_timer.isRunning()) {
+      _timer.stop();
+    }
+    hasEnded = true;
+  }
 }

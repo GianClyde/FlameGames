@@ -65,6 +65,7 @@ class MyGame extends FlameGame {
 
   //buttons row for betting
   late BettingButtonsRow bettingButtonsRow;
+  late bool hasFolded;
 
   // Result tracking
   late String cardResult;
@@ -84,6 +85,7 @@ class MyGame extends FlameGame {
 
   void startGame() async {
     timerSprites = [];
+    hasFolded = false;
     for (int i = 0; i <= 9; i++) {
       timerSprites.add(await loadSprite('numbers/$i.png'));
     }
@@ -103,6 +105,7 @@ class MyGame extends FlameGame {
     guessCardVal = activePlayer.guessCard!;
     card2Val = activePlayer.card2!;
     print("Active player: ${activePlayer.user.userName}");
+    print("isTurn: ${activePlayer.turn}");
     await _createZoomedCards();
     await _createZoomedCardHolders();
     await _createMoneyHolder();
@@ -139,6 +142,7 @@ class MyGame extends FlameGame {
         print("BETTTTTTTTTTTTTTTT");
       },
       foldPressed: () {
+        hasFolded = true;
         fold();
         print("FOLDDDDDDDDDDDDDDDD");
       },
@@ -162,7 +166,7 @@ class MyGame extends FlameGame {
     add(_startingGameOverlayTimer);
   }
 
-  Future<void> _createWinnerOverlay() async {
+  Future<void> _createWinnerOverlay({required bool hasFolded}) async {
     final existing = children.whereType<WinOverlay>().toList();
     for (final overlay in existing) {
       overlay.removeFromParent();
@@ -173,6 +177,7 @@ class MyGame extends FlameGame {
       position: Vector2.zero(),
       priority: 12,
       isWinner: isWinner,
+      hasFolded: hasFolded,
     );
 
     add(winOverlay);
@@ -216,6 +221,7 @@ class MyGame extends FlameGame {
     }
 
     activePlayer = playerMaps["player0"]!;
+    activePlayer.turn = true;
   }
 
   double _calculatePlayerAngle(int index) {
@@ -308,7 +314,7 @@ class MyGame extends FlameGame {
           isWinner = checkResults(bet: "in between");
           print("Result: $isWinner");
 
-          await _createWinnerOverlay();
+          await _createWinnerOverlay(hasFolded: hasFolded);
           hasShownWinnerOverlay = true;
           card1.resetFlip();
           guessCard.resetFlip();
@@ -327,7 +333,7 @@ class MyGame extends FlameGame {
       removeOnFinish: true,
       onTick: () async {
         hasShownWinnerOverlay = false;
-
+        hasFolded = false;
         await switchToNextPlayer();
         headerText.updateUserName(activePlayer.user.userName);
         card1Val = await Card.generateRandomCard(images);
@@ -402,6 +408,13 @@ class MyGame extends FlameGame {
   }
 
   void fold() {
-    timerEnded();
+    if (!hasShownWinnerOverlay) {
+      gameTimer.stop();
+      isWinner = false;
+      _createWinnerOverlay(hasFolded: hasFolded).then((_) {
+        hasShownWinnerOverlay = true;
+        startIntervalTimer(5);
+      });
+    }
   }
 }
