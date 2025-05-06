@@ -9,8 +9,12 @@ class GameCard extends PositionComponent with HasGameReference<MyGame> {
   late Card card;
   bool isFlipped = false;
 
-  GameCard({required this.card, super.position, super.scale, Vector2? size})
-    : super(size: size, priority: 10);
+  void Function()? onFlip;
+  void Function()? onResetFlip;
+  Future<void> Function(Card newCard)? onUpdateCard;
+
+  GameCard({required this.card, super.position, super.scale, super.size})
+    : super(priority: 10);
 
   @override
   Future<void> onLoad() async {
@@ -31,6 +35,7 @@ class GameCard extends PositionComponent with HasGameReference<MyGame> {
           if (!contains(front)) await add(front);
           add(ScaleEffect.to(Vector2(1, 1), EffectController(duration: 0.3)));
           isFlipped = true;
+          onFlip?.call();
         },
       ),
     );
@@ -48,6 +53,7 @@ class GameCard extends PositionComponent with HasGameReference<MyGame> {
           if (!contains(back)) await add(back);
           add(ScaleEffect.to(Vector2(1, 1), EffectController(duration: 0.3)));
           isFlipped = false;
+          onResetFlip?.call();
         },
       ),
     );
@@ -64,5 +70,7 @@ class GameCard extends PositionComponent with HasGameReference<MyGame> {
 
     await add(back);
     isFlipped = false;
+
+    onUpdateCard?.call(newCard);
   }
 }

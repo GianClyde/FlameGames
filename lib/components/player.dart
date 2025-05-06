@@ -62,8 +62,8 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     gameCard1 =
         card1 != null
             ? GameCard(
-              size: Vector2(50, 70),
-              scale: Vector2(0.5, 0.5),
+              size: Vector2(28, 40),
+              //scale: Vector2(0.5, 0.5),
               position: Vector2(size.x, size.y),
               card: card1!,
             )
@@ -72,8 +72,8 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     gameGuessCard =
         guessCard != null
             ? GameCard(
-              size: Vector2(50, 70),
-              scale: Vector2(0.5, 0.5),
+              size: Vector2(28, 40),
+              //scale: Vector2(0.5, 0.5),
               position: Vector2(size.x + 30, size.y),
               card: guessCard!,
             )
@@ -82,8 +82,8 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     gameCard2 =
         card2 != null
             ? GameCard(
-              size: Vector2(50, 70),
-              scale: Vector2(0.5, 0.5),
+              size: Vector2(28, 40),
+              //scale: Vector2(0.5, 0.5),
               position: Vector2(size.x + 60, size.y),
               card: card2!,
             )

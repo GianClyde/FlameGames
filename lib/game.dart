@@ -235,6 +235,21 @@ class MyGame extends FlameGame {
     card1 = GameCard(size: Vector2(70, 90), card: card1Val);
     guessCard = GameCard(size: Vector2(70, 90), card: guessCardVal);
     card2 = GameCard(size: Vector2(70, 90), card: card2Val);
+
+    card1.onFlip = () => activePlayer.gameCard1?.startFlip();
+    guessCard.onFlip = () => activePlayer.gameGuessCard?.startFlip();
+    card2.onFlip = () => activePlayer.gameCard2?.startFlip();
+
+    card1.onResetFlip = () => activePlayer.gameCard1?.resetFlip();
+    guessCard.onResetFlip = () => activePlayer.gameGuessCard?.resetFlip();
+    card2.onResetFlip = () => activePlayer.gameCard2?.resetFlip();
+
+    card1.onUpdateCard =
+        (newCard) async => activePlayer.gameCard1?.updateCard(newCard);
+    guessCard.onUpdateCard =
+        (newCard) async => activePlayer.gameGuessCard?.updateCard(newCard);
+    card2.onUpdateCard =
+        (newCard) async => activePlayer.gameCard2?.updateCard(newCard);
   }
 
   Future<void> _createZoomedCardHolders() async {
