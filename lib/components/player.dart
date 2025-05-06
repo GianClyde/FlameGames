@@ -42,13 +42,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
 
   @override
   FutureOr<void> onLoad() async {
-    playerTurnArrow = PlayerTurnArrow(
-      size: Vector2(200, 200),
-      position: Vector2(size.x / 2, size.y / 2),
-    );
-
-    await add(playerTurnArrow);
-
+    playerTurnArrow = PlayerTurnArrow();
     frontImagePath = 'cards/clubs_2.png';
     userName = TextComponent(
       text: user.userName,
@@ -71,14 +65,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
               size: Vector2(50, 70),
               scale: Vector2(0.5, 0.5),
               position: Vector2(size.x, size.y),
-              card: game_card.Card(
-                front: Sprite(await Flame.images.load('cards/clubs_2.png')),
-                back: Sprite(
-                  await Flame.images.load('cards/other_back_red.png'),
-                ),
-                suit: '',
-                value: '',
-              ),
+              card: card1!,
             )
             : null;
 
@@ -88,14 +75,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
               size: Vector2(50, 70),
               scale: Vector2(0.5, 0.5),
               position: Vector2(size.x + 30, size.y),
-              card: game_card.Card(
-                front: Sprite(await Flame.images.load('cards/clubs_2.png')),
-                back: Sprite(
-                  await Flame.images.load('cards/other_back_red.png'),
-                ),
-                suit: '',
-                value: '',
-              ),
+              card: guessCard!,
             )
             : null;
 
@@ -105,14 +85,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
               size: Vector2(50, 70),
               scale: Vector2(0.5, 0.5),
               position: Vector2(size.x + 60, size.y),
-              card: game_card.Card(
-                front: Sprite(await Flame.images.load('cards/clubs_2.png')),
-                back: Sprite(
-                  await Flame.images.load('cards/other_back_red.png'),
-                ),
-                suit: '',
-                value: '',
-              ),
+              card: card2!,
             )
             : null;
 
@@ -122,12 +95,20 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     return super.onLoad();
   }
 
-  void setTurn(bool isActive) {
+  void setTurn(bool isActive) async {
     turn = isActive;
-    if (!isActive) {
+
+    if (isActive) {
+      if (!children.contains(playerTurnArrow)) {
+        playerTurnArrow = PlayerTurnArrow(
+          size: Vector2(200, 200),
+          position: Vector2(size.x / 2, size.y / 2),
+        );
+        await add(playerTurnArrow);
+      }
       playerTurnArrow.show();
     } else {
-      playerTurnArrow.hide();
+      playerTurnArrow.removeFromParent();
     }
   }
 }

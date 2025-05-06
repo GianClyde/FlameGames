@@ -221,7 +221,7 @@ class MyGame extends FlameGame {
     }
 
     activePlayer = playerMaps["player0"]!;
-    activePlayer.turn = true;
+    activePlayer.setTurn(true);
   }
 
   double _calculatePlayerAngle(int index) {
@@ -349,6 +349,8 @@ class MyGame extends FlameGame {
 
         card1.startFlip();
         card2.startFlip();
+        // activePlayer.gameCard1!.startFlip();
+        // activePlayer.gameCard2!.startFlip();
         gameTimer.start();
       },
     );
