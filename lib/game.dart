@@ -175,7 +175,7 @@ class MyGame extends FlameGame {
     final winOverlay = WinOverlay(
       size: size,
       position: Vector2.zero(),
-      priority: 12,
+      priority: 20,
       isWinner: isWinner,
       hasFolded: hasFolded,
     );
@@ -428,6 +428,9 @@ class MyGame extends FlameGame {
   }
 
   void fold() {
+    card1.resetFlip();
+    guessCard.resetFlip();
+    card2.resetFlip();
     if (!hasShownWinnerOverlay) {
       gameTimer.stop();
       isWinner = false;

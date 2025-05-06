@@ -36,7 +36,7 @@ class WinOverlay extends PositionComponent with HasGameReference<MyGame> {
     final overlayBackground = RectangleComponent(
       size: size,
       position: Vector2.zero(),
-      priority: -1,
+      priority: 19,
       paint: Paint()..color = Colors.black.withOpacity(0.6),
     );
     add(overlayBackground);
