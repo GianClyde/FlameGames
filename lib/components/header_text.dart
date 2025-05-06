@@ -11,4 +11,8 @@ class HeaderText extends TextComponent {
     await super.onLoad();
     text = "$userName's turn";
   }
+
+  void updateUserName(String userName) {
+    text = "$userName's turn";
+  }
 }

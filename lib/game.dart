@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame_practice/components/beginning_timer_overlay.dart';
+import 'package:flame_practice/components/betting_buttons_row.dart';
 import 'package:flame_practice/components/card_holder.dart';
 import 'package:flame_practice/components/deck_manager.dart';
 import 'package:flame_practice/components/game_card.dart';
@@ -62,7 +63,8 @@ class MyGame extends FlameGame {
     Vector2(275, 160),
   ];
 
-  //TODO link active player cards to cardVal 1 and 2
+  //buttons row for betting
+  late BettingButtonsRow bettingButtonsRow;
 
   // Result tracking
   late String cardResult;
@@ -104,6 +106,7 @@ class MyGame extends FlameGame {
     await _createZoomedCards();
     await _createZoomedCardHolders();
     await _createMoneyHolder();
+    await _creatBettingButtons();
   }
 
   Future<void> _createBackground() async {
@@ -122,6 +125,26 @@ class MyGame extends FlameGame {
       position: Vector2((size.x / 2) - 50, 30),
     );
     add(headerText);
+  }
+
+  Future<void> _creatBettingButtons() async {
+    bettingButtonsRow = BettingButtonsRow(
+      priority: 10,
+      //scale: Vector2(0.1, 0.1),
+      position: Vector2(size.x / 2 - 40, size.y / 2 + 150),
+      allInPressed: () {
+        print("ALL INNNNNNNNNNNNN");
+      },
+      betPressed: () {
+        print("BETTTTTTTTTTTTTTTT");
+      },
+      foldPressed: () {
+        fold();
+        print("FOLDDDDDDDDDDDDDDDD");
+      },
+    );
+
+    add(bettingButtonsRow);
   }
 
   Future<void> _createStartCountdown() async {
@@ -304,8 +327,9 @@ class MyGame extends FlameGame {
       removeOnFinish: true,
       onTick: () async {
         hasShownWinnerOverlay = false;
-        switchToNextPlayer();
 
+        await switchToNextPlayer();
+        headerText.updateUserName(activePlayer.user.userName);
         card1Val = await Card.generateRandomCard(images);
         guessCardVal = await Card.generateRandomCard(images);
         card2Val = await Card.generateRandomCard(images);
@@ -375,5 +399,9 @@ class MyGame extends FlameGame {
     } else {
       return 'not in between';
     }
+  }
+
+  void fold() {
+    timerEnded();
   }
 }

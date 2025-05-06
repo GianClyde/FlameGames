@@ -11,6 +11,7 @@ void main() {
       userList: [
         User(id: "12345", userName: "Me"),
         User(id: "54211", userName: "You"),
+        User(id: "54211", userName: "Us"),
       ],
     ),
   );

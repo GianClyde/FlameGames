@@ -1,16 +1,12 @@
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame_practice/components/game_card.dart';
 import 'package:flame_practice/game.dart';
-import 'package:flame_practice/models/card.dart';
-import 'package:flame_practice/models/player.dart';
 import 'package:flame_practice/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flame_practice/models/card.dart' as game_card;
-import 'package:flutter/material.dart';
 
 class Player extends PositionComponent with HasGameReference<MyGame> {
   final User user;
