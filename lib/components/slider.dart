@@ -10,7 +10,7 @@ class SliderComponent extends PositionComponent
   final double sliderWidth;
   final double sliderHeight;
   final double min;
-  final double max;
+  late double max;
   final ValueChanged<double>? onChanged;
 
   double _value;
@@ -86,5 +86,11 @@ class SliderComponent extends PositionComponent
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
     _dragging = false;
+  }
+
+  void setMax(double newMax) {
+    _value = _value.clamp(min, newMax);
+    max = newMax;
+    onChanged?.call(_value);
   }
 }

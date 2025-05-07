@@ -76,9 +76,6 @@ class MyGame extends FlameGame {
 
   bool betterShown = false;
 
-  //slider
-  late SliderComponent slider;
-
   //Better
   late Better better;
 

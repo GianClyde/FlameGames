@@ -56,9 +56,11 @@ class Better extends SpriteComponent with HasGameReference<MyGame> {
   FutureOr<void> onLoad() async {
     btnSize = Vector2(110, 60);
     sliderValue = sliderMinValue;
+
     await _createSliderRow();
     await _createBetButtons();
     await _createCloseButton();
+    slider.setMax(sliderMaxValue);
     return super.onLoad();
   }
 
