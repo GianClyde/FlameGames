@@ -351,6 +351,12 @@ class MyGame extends FlameGame {
   Future<void> switchToNextPlayer() async {
     activePlayer.setTurn(false);
 
+    if (betterShown) {
+      remove(better);
+      betterShown = false;
+      _creatBettingButtons();
+    }
+
     currentPlayerIndex = (currentPlayerIndex + 1) % room.userList.length;
     activePlayer = playerMaps["player$currentPlayerIndex"]!;
 
