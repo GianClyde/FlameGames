@@ -20,8 +20,8 @@ class SliderComponent extends PositionComponent
   SliderComponent({
     required this.sliderWidth,
     this.sliderHeight = 20,
-    this.min = 0.0,
-    this.max = 1.0,
+    this.min = 100,
+    this.max = 1000,
     double value = 0.5,
     this.onChanged,
     super.position,
@@ -37,7 +37,7 @@ class SliderComponent extends PositionComponent
   @override
   void render(Canvas canvas) {
     final Paint trackPaint = Paint()..color = Colors.grey.shade700;
-    final Paint fillPaint = Paint()..color = Colors.blue;
+    final Paint fillPaint = Paint()..color = Colors.red;
     final Paint thumbPaint = Paint()..color = Colors.white;
 
     // Draw track

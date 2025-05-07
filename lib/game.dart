@@ -126,10 +126,11 @@ class MyGame extends FlameGame {
     final betterBg = await loadSprite('better_bg.png');
 
     better = Better(
-      size: Vector2(350, 75),
+      sliderMaxValue: activePlayer.walletBalance,
+      size: Vector2(390, 75),
       priority: 15,
       position: Vector2(size.x / 2 - 200, size.y / 2 + 130),
-      sliderMinValue: 0.5,
+      sliderMinValue: 100,
       onMinBtnPressed: () {},
       onHalfBtnPressed: () {},
       onMaxBtnPressed: () {},

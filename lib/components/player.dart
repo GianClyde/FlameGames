@@ -26,6 +26,7 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
 
   late String frontImagePath;
 
+  late double walletBalance;
   Player({
     required this.user,
     super.size,
@@ -36,12 +37,11 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     required this.card1,
     required this.card2,
     required this.guessCard,
-  }) : super(priority: 20) {
-    debugMode = true;
-  }
-
+  }) : super(priority: 20);
   @override
   FutureOr<void> onLoad() async {
+    walletBalance = user.userWallet.balance;
+
     playerTurnArrow = PlayerTurnArrow();
     frontImagePath = 'cards/clubs_2.png';
     userName = TextComponent(
