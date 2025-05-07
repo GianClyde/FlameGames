@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame_practice/components/beginning_timer_overlay.dart';
+import 'package:flame_practice/components/better.dart';
 import 'package:flame_practice/components/betting_buttons_row.dart';
 import 'package:flame_practice/components/card_holder.dart';
 import 'package:flame_practice/components/deck_manager.dart';
@@ -73,8 +74,13 @@ class MyGame extends FlameGame {
   late bool isWinner;
   bool hasShownWinnerOverlay = false;
 
+  bool betterShown = false;
+
   //slider
   late SliderComponent slider;
+
+  //Better
+  late Better better;
 
   MyGame({super.children, super.world, super.camera, required this.room});
 
@@ -114,17 +120,32 @@ class MyGame extends FlameGame {
     await _createZoomedCardHolders();
     await _createMoneyHolder();
     await _creatBettingButtons();
-    await _createSlider();
   }
 
-  Future<void> _createSlider() async {
-    slider = SliderComponent(
-      sliderWidth: 200,
-      onChanged: (value) {
-        print("SLIDER: $value");
+  Future<void> _createBetter() async {
+    final betterBg = await loadSprite('better_bg.png');
+
+    better = Better(
+      size: Vector2(350, 75),
+      priority: 15,
+      position: Vector2(size.x / 2 - 200, size.y / 2 + 130),
+      sliderMinValue: 0.5,
+      onMinBtnPressed: () {},
+      onHalfBtnPressed: () {},
+      onMaxBtnPressed: () {},
+      bg: betterBg,
+      onClosed: () async {
+        remove(better);
+        await _creatBettingButtons();
+        betterShown = false;
       },
     );
-    add(slider);
+
+    if (!betterShown) {
+      await add(better);
+    } else {
+      remove(better);
+    }
   }
 
   Future<void> _createBackground() async {
@@ -153,7 +174,10 @@ class MyGame extends FlameGame {
       allInPressed: () {
         print("ALL INNNNNNNNNNNNN");
       },
-      betPressed: () {
+      betPressed: () async {
+        await _createBetter();
+        remove(bettingButtonsRow);
+        betterShown = !betterShown;
         print("BETTTTTTTTTTTTTTTT");
       },
       foldPressed: () {

@@ -3,7 +3,6 @@ import 'package:flame_practice/game.dart';
 import 'package:flutter/painting.dart';
 
 class MoneyHolder extends SpriteComponent with HasGameReference<MyGame> {
-  late SpriteComponent _background;
   late TextComponent _text;
   int _money = 0;
 

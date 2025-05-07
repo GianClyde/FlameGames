@@ -1,8 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/geometry.dart';
-import 'package:flame/input.dart';
+
 import 'package:flame_practice/game.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +24,7 @@ class SliderComponent extends PositionComponent
     this.max = 1.0,
     double value = 0.5,
     this.onChanged,
+    super.position,
   }) : _value = value,
        super(size: Vector2(sliderWidth, sliderHeight));
 
