@@ -5,6 +5,7 @@ import 'package:flame/sprite.dart';
 import 'package:flame_practice/models/card.dart';
 
 class DeckManager {
+  bool deckEmpty = false;
   final List<Card> _deck = [];
   final List<String> suits = ['clubs', 'diamonds', 'hearts', 'spades'];
   final List<String> values = [
@@ -24,6 +25,7 @@ class DeckManager {
   ];
 
   bool _isLoaded = false;
+  int _totalCards = 0;
 
   Future<void> load() async {
     if (_isLoaded) return;
@@ -41,12 +43,14 @@ class DeckManager {
     }
 
     _deck.shuffle(Random());
+    _totalCards = _deck.length;
     _isLoaded = true;
   }
 
-  Card drawCard() {
+  Card? drawCard() {
     if (_deck.isEmpty) {
-      throw StateError('No more cards in the deck!');
+      deckEmpty = true;
+      return null;
     }
     return _deck.removeLast();
   }
@@ -54,5 +58,15 @@ class DeckManager {
   void resetDeck() {
     _deck.clear();
     _isLoaded = false;
+    deckEmpty = false;
+    _totalCards = 0;
+  }
+
+  int getDrawnCount() {
+    return _totalCards - _deck.length;
+  }
+
+  int getDeckSize() {
+    return _deck.length;
   }
 }

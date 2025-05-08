@@ -91,6 +91,8 @@ class MyGame extends FlameGame {
 
   MyGame({super.children, super.world, super.camera, required this.room});
 
+  bool hasBet = false;
+
   @override
   Future<void> onLoad() async {
     await Flame.device.fullScreen();
@@ -165,19 +167,23 @@ class MyGame extends FlameGame {
         betterShown = false;
       },
       onDealPressed: () {
+        hasBet = true;
         activePlayer.updateCurrentBet(amount: better.sliderValue);
         betterShown = false;
         remove(better);
 
-        cardsEqual = card1Val.value == card2Val.value;
+        cardsEqual = activePlayer.card1?.value == activePlayer.card2?.value;
         print(
-          "CARDSEQUAL: $cardsEqual || ACTIVE PLAYER: ${activePlayer.user.userName} || ACTIV PLAYER CARDS = AC1: ${activePlayer.card1?.value} AC2: ${activePlayer.card2?.value} ||  CARD VALUES = C1: ${card1Val.value} C2: ${card2Val.value}",
+          "CARDSEQUAL: $cardsEqual || ACTIVE PLAYER: ${activePlayer.user.userName} || ACTIV PLAYER CARDS = AC1: ${activePlayer.card1?.value}  AGC: ${activePlayer.guessCard?.value}  AC2: ${activePlayer.card2?.value} ||  CARD VALUES = C1: ${card1Val.value} C2: ${card2Val.value}",
         );
+
         if (cardsEqual) {
           _createCardEqualBox();
         } else {
           _creatBettingButtons();
         }
+        gameTimer.stop();
+        gameFlow();
 
         print("BET VALUE: ${activePlayer.currentBet}");
       },
@@ -322,9 +328,9 @@ class MyGame extends FlameGame {
   Future<void> _createPlayers() async {
     playerMaps = {};
 
-    playerCard1 = deckManager.drawCard();
-    playerCard2 = deckManager.drawCard();
-    playerGuessCard = deckManager.drawCard();
+    // playerCard1 = deckManager.drawCard();
+    // playerCard2 = deckManager.drawCard();
+    // playerGuessCard = deckManager.drawCard();
 
     // //for testing purposes
     // playerCard1 = Card(
@@ -346,10 +352,10 @@ class MyGame extends FlameGame {
 
       playerMaps['player$i'] = Player(
         position: tableCoordinates[i],
-        card1: playerCard1,
-        card2: playerCard2,
+        card1: deckManager.drawCard(),
+        card2: deckManager.drawCard(),
         angle: angle,
-        guessCard: playerGuessCard,
+        guessCard: deckManager.drawCard(),
         user: room.userList[i],
       );
 
@@ -446,7 +452,15 @@ class MyGame extends FlameGame {
   }
 
   void timerEnded() {
-    gameFlow();
+    print("HAS BET: $hasBet");
+    if (hasBet) {
+      print("HAS BET: gameflow");
+      gameFlow();
+    } else {
+      print("HAS BET: fold");
+      hasFolded = true;
+      fold();
+    }
   }
 
   void beginningTimerEnded() {
@@ -485,6 +499,7 @@ class MyGame extends FlameGame {
           card1.resetFlip();
           guessCard.resetFlip();
           card2.resetFlip();
+          hasBet = false;
           startIntervalTimer(5);
         }
       },
@@ -502,13 +517,21 @@ class MyGame extends FlameGame {
         hasFolded = false;
         await switchToNextPlayer();
         headerText.updateUserName(activePlayer.user.userName);
-        card1Val = await Card.generateRandomCard(images);
-        guessCardVal = await Card.generateRandomCard(images);
-        card2Val = await Card.generateRandomCard(images);
+        activePlayer.card1 = deckManager.drawCard();
+        activePlayer.guessCard = deckManager.drawCard();
+        activePlayer.card2 = deckManager.drawCard();
 
-        await card1.updateCard(card1Val);
-        await guessCard.updateCard(guessCardVal);
-        await card2.updateCard(card2Val);
+        await card1.updateCard(activePlayer.card1!);
+        await guessCard.updateCard(activePlayer.guessCard!);
+        await card2.updateCard(activePlayer.card2!);
+
+        print(
+          "CARD COUNT: ${deckManager.getDrawnCount()} out of ${deckManager.getDeckSize()}",
+        );
+
+        card1Val = activePlayer.card1!;
+        guessCardVal = activePlayer.guessCard!;
+        card2Val = activePlayer.card2!;
 
         card1.startFlip();
         card2.startFlip();
@@ -578,12 +601,14 @@ class MyGame extends FlameGame {
   }
 
   void fold() {
+    print("HAS BET: fold called");
     card1.resetFlip();
     guessCard.resetFlip();
     card2.resetFlip();
     if (!hasShownWinnerOverlay) {
       gameTimer.stop();
       isWinner = false;
+      hasBet = false;
       _createWinnerOverlay(hasFolded: hasFolded).then((_) {
         hasShownWinnerOverlay = true;
         startIntervalTimer(5);

@@ -11,9 +11,9 @@ import 'package:flame_practice/models/card.dart' as game_card;
 
 class Player extends PositionComponent with HasGameReference<MyGame> {
   final User user;
-  final game_card.Card? card1;
-  final game_card.Card? card2;
-  final game_card.Card? guessCard;
+  game_card.Card? card1;
+  game_card.Card? card2;
+  game_card.Card? guessCard;
 
   late GameCard? gameCard1;
   late GameCard? gameCard2;
