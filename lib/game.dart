@@ -167,6 +167,9 @@ class MyGame extends FlameGame {
         activePlayer.updateCurrentBet(amount: better.sliderValue);
         betterShown = false;
         remove(better);
+
+        cardsEqual = playerCard1.value == playerCard2.value;
+
         if (cardsEqual) {
           _createCardEqualBox();
         } else {
@@ -194,8 +197,9 @@ class MyGame extends FlameGame {
       onHigherPresed: () {},
       onLowerPresed: () {},
     );
-    if (!cardsEqual) {
-      await add(cardsEqualBox);
+
+    if (cardsEqual) {
+      add(cardsEqualBox);
     } else {
       remove(cardsEqualBox);
     }
@@ -297,6 +301,7 @@ class MyGame extends FlameGame {
     // playerCard2 = deckManager.drawCard();
     // playerGuessCard = deckManager.drawCard();
 
+    //for testing purposes
     playerCard1 = Card(
       suit: "clubs",
       value: "4",
@@ -442,6 +447,10 @@ class MyGame extends FlameGame {
   Future<void> gameFlow() async {
     guessCard.startFlip();
 
+    if (cardsEqual) {
+      remove(cardsEqualBox);
+      await _creatBettingButtons();
+    }
     TimerComponent delayTimer = TimerComponent(
       period: 2.0,
       removeOnFinish: true,
@@ -499,10 +508,7 @@ class MyGame extends FlameGame {
     print("card result: $cardResult bet: $bet");
 
     if (cardResult != "in between" && cardResult != "not in between") {
-      cardsEqual = true;
-    } else {
-      cardsEqual = false;
-    }
+    } else {}
     return bet == cardResult;
   }
 
