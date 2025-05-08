@@ -46,6 +46,7 @@ class CardsEqualBox extends SpriteComponent {
       position: Vector2((size.x / 2) - 200, size.y / 2 - 15),
       normal: Sprite(higherSprite),
       pressed: Sprite(higherSprite),
+      onPressed: onHigherPresed,
     );
 
     add(_higherBtn);
@@ -55,6 +56,7 @@ class CardsEqualBox extends SpriteComponent {
       position: Vector2((size.x / 2) - 10, size.y / 2 - 15),
       normal: Sprite(lowerSprite),
       pressed: Sprite(lowerSprite),
+      onPressed: onLowerPresed,
     );
     add(_lowerBtn);
 

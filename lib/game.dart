@@ -97,6 +97,7 @@ class MyGame extends FlameGame {
     await Flame.device.setLandscape();
     images = Images();
     await _createBackground();
+    isWinner = false;
     startGame();
   }
 
@@ -194,14 +195,42 @@ class MyGame extends FlameGame {
       priority: 15,
       position: Vector2(size.x / 2 - 200, size.y / 2 + 130),
       bg: betterBg,
-      onHigherPresed: () {},
-      onLowerPresed: () {},
+      onHigherPresed: () async {
+        playerSide = "higher";
+        if (cardsEqualBox.isMounted) {
+          remove(cardsEqualBox);
+          await _creatBettingButtons();
+          gameFlow();
+          gameTimer.stop();
+
+          _createWinnerOverlay(hasFolded: hasFolded).then((_) {
+            hasShownWinnerOverlay = true;
+            startIntervalTimer(5);
+          });
+        }
+      },
+      onLowerPresed: () async {
+        playerSide = "lower";
+        if (cardsEqualBox.isMounted) {
+          remove(cardsEqualBox);
+          await _creatBettingButtons();
+          gameFlow();
+          gameTimer.stop();
+
+          _createWinnerOverlay(hasFolded: hasFolded).then((_) {
+            hasShownWinnerOverlay = true;
+            startIntervalTimer(5);
+          });
+        }
+      },
     );
 
     if (cardsEqual) {
       add(cardsEqualBox);
     } else {
-      remove(cardsEqualBox);
+      if (cardsEqualBox.isMounted) {
+        remove(cardsEqualBox);
+      }
     }
   }
 
@@ -447,10 +476,6 @@ class MyGame extends FlameGame {
   Future<void> gameFlow() async {
     guessCard.startFlip();
 
-    if (cardsEqual) {
-      remove(cardsEqualBox);
-      await _creatBettingButtons();
-    }
     TimerComponent delayTimer = TimerComponent(
       period: 2.0,
       removeOnFinish: true,
@@ -507,8 +532,7 @@ class MyGame extends FlameGame {
     );
     print("card result: $cardResult bet: $bet");
 
-    if (cardResult != "in between" && cardResult != "not in between") {
-    } else {}
+    print("RESULTS: PLAYER SIDE: ${bet} - CARD RESULT: ${cardResult}");
     return bet == cardResult;
   }
 
