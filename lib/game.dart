@@ -293,7 +293,10 @@ class MyGame extends FlameGame {
     add(_startingGameOverlayTimer);
   }
 
-  Future<void> _createWinnerOverlay({required bool hasFolded}) async {
+  Future<void> _createWinnerOverlay({
+    bool hasFolded = false,
+    bool deckEmpty = false,
+  }) async {
     final existing = children.whereType<WinOverlay>().toList();
     for (final overlay in existing) {
       overlay.removeFromParent();
@@ -305,6 +308,7 @@ class MyGame extends FlameGame {
       priority: 20,
       isWinner: isWinner,
       hasFolded: hasFolded,
+      deckEmpty: deckEmpty,
     );
 
     add(winOverlay);
@@ -479,6 +483,26 @@ class MyGame extends FlameGame {
     currentPlayerIndex = (currentPlayerIndex + 1) % room.userList.length;
     activePlayer = playerMaps["player$currentPlayerIndex"]!;
 
+    if (deckManager.deckEmpty) {
+      deckManager.resetDeck();
+      if (!hasShownWinnerOverlay) {
+        gameTimer.stop();
+        isWinner = false;
+        hasBet = false;
+        _createWinnerOverlay(deckEmpty: true).then((_) {
+          hasShownWinnerOverlay = true;
+          startIntervalTimer(5);
+        });
+      }
+    }
+    activePlayer.card1 = deckManager.drawCard();
+    activePlayer.guessCard = deckManager.drawCard();
+    activePlayer.card2 = deckManager.drawCard();
+
+    activePlayer.gameCard1?.updateCard(activePlayer.card1!);
+    activePlayer.gameGuessCard?.updateCard(activePlayer.guessCard!);
+    activePlayer.gameCard2?.updateCard(activePlayer.card2!);
+
     activePlayer.setTurn(true);
     gameTimer.reset();
   }
@@ -500,7 +524,7 @@ class MyGame extends FlameGame {
           guessCard.resetFlip();
           card2.resetFlip();
           hasBet = false;
-          startIntervalTimer(5);
+          startIntervalTimer(3);
         }
       },
     );
@@ -517,9 +541,6 @@ class MyGame extends FlameGame {
         hasFolded = false;
         await switchToNextPlayer();
         headerText.updateUserName(activePlayer.user.userName);
-        activePlayer.card1 = deckManager.drawCard();
-        activePlayer.guessCard = deckManager.drawCard();
-        activePlayer.card2 = deckManager.drawCard();
 
         await card1.updateCard(activePlayer.card1!);
         await guessCard.updateCard(activePlayer.guessCard!);

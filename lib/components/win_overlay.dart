@@ -10,7 +10,9 @@ class WinOverlay extends PositionComponent with HasGameReference<MyGame> {
 
   final bool isWinner;
   final bool hasFolded;
+  final bool deckEmpty;
   WinOverlay({
+    required this.deckEmpty,
     this.hasFolded = false,
     required this.isWinner,
     super.position,
@@ -20,6 +22,8 @@ class WinOverlay extends PositionComponent with HasGameReference<MyGame> {
     _timer = Timer(5.0, onTick: _removeOverlay, autoStart: true);
     if (hasFolded) {
       result = "FOLDED";
+    } else if (deckEmpty) {
+      result = "DECK EMPTY, ROUND 1 OVER";
     } else {
       if (isWinner) {
         result = "WIN";
