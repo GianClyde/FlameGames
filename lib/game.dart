@@ -169,8 +169,10 @@ class MyGame extends FlameGame {
         betterShown = false;
         remove(better);
 
-        cardsEqual = playerCard1.value == playerCard2.value;
-
+        cardsEqual = card1Val.value == card2Val.value;
+        print(
+          "CARDSEQUAL: $cardsEqual || ACTIVE PLAYER: ${activePlayer.user.userName} || ACTIV PLAYER CARDS = AC1: ${activePlayer.card1?.value} AC2: ${activePlayer.card2?.value} ||  CARD VALUES = C1: ${card1Val.value} C2: ${card2Val.value}",
+        );
         if (cardsEqual) {
           _createCardEqualBox();
         } else {
@@ -200,13 +202,10 @@ class MyGame extends FlameGame {
         if (cardsEqualBox.isMounted) {
           remove(cardsEqualBox);
           await _creatBettingButtons();
-          gameFlow();
-          gameTimer.stop();
 
-          _createWinnerOverlay(hasFolded: hasFolded).then((_) {
-            hasShownWinnerOverlay = true;
-            startIntervalTimer(5);
-          });
+          gameTimer.stop();
+          cardsEqual = false;
+          gameFlow();
         }
       },
       onLowerPresed: () async {
@@ -214,13 +213,10 @@ class MyGame extends FlameGame {
         if (cardsEqualBox.isMounted) {
           remove(cardsEqualBox);
           await _creatBettingButtons();
-          gameFlow();
-          gameTimer.stop();
 
-          _createWinnerOverlay(hasFolded: hasFolded).then((_) {
-            hasShownWinnerOverlay = true;
-            startIntervalTimer(5);
-          });
+          gameTimer.stop();
+          cardsEqual = false;
+          gameFlow();
         }
       },
     );
@@ -326,24 +322,24 @@ class MyGame extends FlameGame {
   Future<void> _createPlayers() async {
     playerMaps = {};
 
-    // playerCard1 = deckManager.drawCard();
-    // playerCard2 = deckManager.drawCard();
-    // playerGuessCard = deckManager.drawCard();
-
-    //for testing purposes
-    playerCard1 = Card(
-      suit: "clubs",
-      value: "4",
-      front: Sprite(await Flame.images.load('cards/clubs_4.png')),
-      back: Sprite(await Flame.images.load('cards/other_back_red.png')),
-    );
-    playerCard2 = Card(
-      suit: "clubs",
-      value: "4",
-      front: Sprite(await Flame.images.load('cards/clubs_4.png')),
-      back: Sprite(await Flame.images.load('cards/other_back_red.png')),
-    );
+    playerCard1 = deckManager.drawCard();
+    playerCard2 = deckManager.drawCard();
     playerGuessCard = deckManager.drawCard();
+
+    // //for testing purposes
+    // playerCard1 = Card(
+    //   suit: "clubs",
+    //   value: "4",
+    //   front: Sprite(await Flame.images.load('cards/clubs_4.png')),
+    //   back: Sprite(await Flame.images.load('cards/other_back_red.png')),
+    // );
+    // playerCard2 = Card(
+    //   suit: "clubs",
+    //   value: "4",
+    //   front: Sprite(await Flame.images.load('cards/clubs_4.png')),
+    //   back: Sprite(await Flame.images.load('cards/other_back_red.png')),
+    // );
+    // playerGuessCard = deckManager.drawCard();
 
     for (int i = 0; i < room.userList.length; i++) {
       angle = _calculatePlayerAngle(i);
@@ -377,9 +373,9 @@ class MyGame extends FlameGame {
   }
 
   Future<void> _createZoomedCards() async {
-    card1 = GameCard(size: Vector2(70, 90), card: card1Val);
-    guessCard = GameCard(size: Vector2(70, 90), card: guessCardVal);
-    card2 = GameCard(size: Vector2(70, 90), card: card2Val);
+    card1 = GameCard(size: Vector2(70, 90), card: activePlayer.card1!);
+    guessCard = GameCard(size: Vector2(70, 90), card: activePlayer.guessCard!);
+    card2 = GameCard(size: Vector2(70, 90), card: activePlayer.card2!);
 
     card1.onFlip = () => activePlayer.gameCard1?.startFlip();
     guessCard.onFlip = () => activePlayer.gameGuessCard?.startFlip();
