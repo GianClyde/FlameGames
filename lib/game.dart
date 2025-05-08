@@ -7,6 +7,7 @@ import 'package:flame_practice/components/beginning_timer_overlay.dart';
 import 'package:flame_practice/components/better.dart';
 import 'package:flame_practice/components/betting_buttons_row.dart';
 import 'package:flame_practice/components/card_holder.dart';
+import 'package:flame_practice/components/cards_equal_box.dart';
 import 'package:flame_practice/components/deck_manager.dart';
 import 'package:flame_practice/components/game_card.dart';
 import 'package:flame_practice/components/game_timer.dart';
@@ -75,6 +76,7 @@ class MyGame extends FlameGame {
   bool hasShownWinnerOverlay = false;
 
   bool betterShown = false;
+  bool cardsEqual = false;
 
   //Better
   late Better better;
@@ -82,6 +84,10 @@ class MyGame extends FlameGame {
   //pot
   double pot = 0.0;
   late MoneyHolder potHolder;
+
+  late CardsEqualBox cardsEqualBox;
+
+  String playerSide = "in between";
 
   MyGame({super.children, super.world, super.camera, required this.room});
 
@@ -110,8 +116,9 @@ class MyGame extends FlameGame {
     _createGameTimer();
     _createStartCountdown();
 
-    await _createPlayers();
     await _createPotHolder();
+    await _createPlayers();
+
     await _createHeaderText();
     card1Val = activePlayer.card1!;
     guessCardVal = activePlayer.guessCard!;
@@ -123,6 +130,7 @@ class MyGame extends FlameGame {
     await _createZoomedCardHolders();
     await _createMoneyHolder();
     await _creatBettingButtons();
+    // await _createCardEqualBox();
   }
 
   Future<void> _createPotHolder() async {
@@ -155,12 +163,41 @@ class MyGame extends FlameGame {
         await _creatBettingButtons();
         betterShown = false;
       },
+      onDealPressed: () {
+        activePlayer.updateCurrentBet(amount: better.sliderValue);
+        betterShown = false;
+        remove(better);
+        if (cardsEqual) {
+          _createCardEqualBox();
+        } else {
+          _creatBettingButtons();
+        }
+
+        print("BET VALUE: ${activePlayer.currentBet}");
+      },
     );
 
     if (!betterShown) {
       await add(better);
     } else {
       remove(better);
+    }
+  }
+
+  Future<void> _createCardEqualBox() async {
+    final betterBg = await loadSprite('better_bg.png');
+    cardsEqualBox = CardsEqualBox(
+      size: Vector2(390, 75),
+      priority: 15,
+      position: Vector2(size.x / 2 - 200, size.y / 2 + 130),
+      bg: betterBg,
+      onHigherPresed: () {},
+      onLowerPresed: () {},
+    );
+    if (!cardsEqual) {
+      await add(cardsEqualBox);
+    } else {
+      remove(cardsEqualBox);
     }
   }
 
@@ -256,8 +293,22 @@ class MyGame extends FlameGame {
   Future<void> _createPlayers() async {
     playerMaps = {};
 
-    playerCard1 = deckManager.drawCard();
-    playerCard2 = deckManager.drawCard();
+    // playerCard1 = deckManager.drawCard();
+    // playerCard2 = deckManager.drawCard();
+    // playerGuessCard = deckManager.drawCard();
+
+    playerCard1 = Card(
+      suit: "clubs",
+      value: "4",
+      front: Sprite(await Flame.images.load('cards/clubs_4.png')),
+      back: Sprite(await Flame.images.load('cards/other_back_red.png')),
+    );
+    playerCard2 = Card(
+      suit: "clubs",
+      value: "4",
+      front: Sprite(await Flame.images.load('cards/clubs_4.png')),
+      back: Sprite(await Flame.images.load('cards/other_back_red.png')),
+    );
     playerGuessCard = deckManager.drawCard();
 
     for (int i = 0; i < room.userList.length; i++) {
@@ -396,7 +447,7 @@ class MyGame extends FlameGame {
       removeOnFinish: true,
       onTick: () async {
         if (gameTimer.hasEnded && !hasShownWinnerOverlay) {
-          isWinner = checkResults(bet: "in between");
+          isWinner = checkResults(bet: playerSide);
           print("Result: $isWinner");
 
           await _createWinnerOverlay(hasFolded: hasFolded);
@@ -446,6 +497,12 @@ class MyGame extends FlameGame {
       guessCard: guessCardVal,
     );
     print("card result: $cardResult bet: $bet");
+
+    if (cardResult != "in between" && cardResult != "not in between") {
+      cardsEqual = true;
+    } else {
+      cardsEqual = false;
+    }
     return bet == cardResult;
   }
 

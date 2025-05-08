@@ -28,6 +28,7 @@ class Better extends SpriteComponent with HasGameReference<MyGame> {
   final VoidCallback onMinBtnPressed;
   final VoidCallback onHalfBtnPressed;
   final VoidCallback onMaxBtnPressed;
+  final VoidCallback onDealPressed;
   final VoidCallback onClosed;
 
   final double sliderMinValue;
@@ -47,6 +48,7 @@ class Better extends SpriteComponent with HasGameReference<MyGame> {
     required this.sliderMinValue,
     required this.sliderMaxValue,
     required this.onClosed,
+    required this.onDealPressed,
     required this.onMinBtnPressed,
     required this.onHalfBtnPressed,
     required this.onMaxBtnPressed,
@@ -106,7 +108,7 @@ class Better extends SpriteComponent with HasGameReference<MyGame> {
       priority: 15,
       normal: Sprite(dealBtnImg),
       pressed: Sprite(dealBtnImg),
-      onPressed: onMinBtnPressed,
+      onPressed: onDealPressed,
       size: Vector2(75, 60),
       position: Vector2((size.x / 2) + 120, size.y / 2 - 30),
     );
