@@ -48,18 +48,20 @@ class DeckManager {
   }
 
   Card? drawCard() {
-    if (_deck.isEmpty) {
+    if (_deck.isEmpty || getDeckSize() == 1) {
       deckEmpty = true;
+      print("CARD COUNT: $deckEmpty");
       return null;
     }
     return _deck.removeLast();
   }
 
-  void resetDeck() {
+  void resetDeck() async {
     _deck.clear();
     _isLoaded = false;
     deckEmpty = false;
     _totalCards = 0;
+    await load();
   }
 
   int getDrawnCount() {

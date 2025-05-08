@@ -27,6 +27,11 @@ void main() {
           userName: "Us",
           userWallet: Wallet(walletId: "12345a", balance: 3000),
         ),
+        User(
+          id: "1423432",
+          userName: "They",
+          userWallet: Wallet(walletId: "423432", balance: 4000),
+        ),
       ],
     ),
   );

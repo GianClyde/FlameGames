@@ -477,7 +477,7 @@ class MyGame extends FlameGame {
     if (betterShown) {
       remove(better);
       betterShown = false;
-      _creatBettingButtons();
+      await _creatBettingButtons();
     }
 
     currentPlayerIndex = (currentPlayerIndex + 1) % room.userList.length;
@@ -489,19 +489,30 @@ class MyGame extends FlameGame {
         gameTimer.stop();
         isWinner = false;
         hasBet = false;
-        _createWinnerOverlay(deckEmpty: true).then((_) {
-          hasShownWinnerOverlay = true;
-          startIntervalTimer(5);
-        });
+        await _createWinnerOverlay(deckEmpty: true);
+        hasShownWinnerOverlay = true;
+        startIntervalTimer(10);
+        return;
       }
+      return;
     }
-    activePlayer.card1 = deckManager.drawCard();
-    activePlayer.guessCard = deckManager.drawCard();
-    activePlayer.card2 = deckManager.drawCard();
 
-    activePlayer.gameCard1?.updateCard(activePlayer.card1!);
-    activePlayer.gameGuessCard?.updateCard(activePlayer.guessCard!);
-    activePlayer.gameCard2?.updateCard(activePlayer.card2!);
+    final newCard1 = deckManager.drawCard();
+    final newGuessCard = deckManager.drawCard();
+    final newCard2 = deckManager.drawCard();
+
+    if (newCard1 == null || newGuessCard == null || newCard2 == null) {
+      print("One or more drawn cards are null. Skipping turn.");
+      return;
+    }
+
+    activePlayer.card1 = newCard1;
+    activePlayer.guessCard = newGuessCard;
+    activePlayer.card2 = newCard2;
+
+    activePlayer.gameCard1?.updateCard(newCard1);
+    activePlayer.gameGuessCard?.updateCard(newGuessCard);
+    activePlayer.gameCard2?.updateCard(newCard2);
 
     activePlayer.setTurn(true);
     gameTimer.reset();
@@ -539,7 +550,22 @@ class MyGame extends FlameGame {
       onTick: () async {
         hasShownWinnerOverlay = false;
         hasFolded = false;
+
+        if (deckManager.deckEmpty) {
+          deckManager.resetDeck();
+          if (!hasShownWinnerOverlay) {
+            gameTimer.stop();
+            isWinner = false;
+            hasBet = false;
+            await _createWinnerOverlay(deckEmpty: true);
+            hasShownWinnerOverlay = true;
+            startIntervalTimer(10);
+            return;
+          }
+          return;
+        }
         await switchToNextPlayer();
+
         headerText.updateUserName(activePlayer.user.userName);
 
         await card1.updateCard(activePlayer.card1!);
