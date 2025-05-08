@@ -27,6 +27,9 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
   late String frontImagePath;
 
   late double walletBalance;
+
+  late double currentBet;
+  late double playerWinnings;
   Player({
     required this.user,
     super.size,
@@ -37,11 +40,13 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     required this.card1,
     required this.card2,
     required this.guessCard,
-  }) : super(priority: 20);
+  }) : super(priority: 20) {
+    currentBet = 0;
+    playerWinnings = 0;
+    walletBalance = user.userWallet.balance;
+  }
   @override
   FutureOr<void> onLoad() async {
-    walletBalance = user.userWallet.balance;
-
     playerTurnArrow = PlayerTurnArrow();
     frontImagePath = 'cards/clubs_2.png';
     userName = TextComponent(
@@ -110,5 +115,13 @@ class Player extends PositionComponent with HasGameReference<MyGame> {
     } else {
       playerTurnArrow.removeFromParent();
     }
+  }
+
+  void updateCurrentBet({required double amount}) {
+    currentBet = amount;
+  }
+
+  void updatePlayerWinnings({required double newWinnings}) {
+    playerWinnings = newWinnings;
   }
 }

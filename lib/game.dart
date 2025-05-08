@@ -79,6 +79,10 @@ class MyGame extends FlameGame {
   //Better
   late Better better;
 
+  //pot
+  double pot = 0.0;
+  late MoneyHolder potHolder;
+
   MyGame({super.children, super.world, super.camera, required this.room});
 
   @override
@@ -107,16 +111,30 @@ class MyGame extends FlameGame {
     _createStartCountdown();
 
     await _createPlayers();
+    await _createPotHolder();
     await _createHeaderText();
     card1Val = activePlayer.card1!;
     guessCardVal = activePlayer.guessCard!;
     card2Val = activePlayer.card2!;
     print("Active player: ${activePlayer.user.userName}");
     print("isTurn: ${activePlayer.turn}");
+
     await _createZoomedCards();
     await _createZoomedCardHolders();
     await _createMoneyHolder();
     await _creatBettingButtons();
+  }
+
+  Future<void> _createPotHolder() async {
+    final potHolderSprite = await loadSprite('holders/pot_bg.png');
+    potHolder = MoneyHolder(
+      fontSize: 12,
+      bg: potHolderSprite,
+      position: Vector2(size.x / 2 - 60, size.y / 2 - 25),
+      size: Vector2(130, 60),
+    );
+
+    add(potHolder);
   }
 
   Future<void> _createBetter() async {
@@ -254,6 +272,11 @@ class MyGame extends FlameGame {
         user: room.userList[i],
       );
 
+      playerMaps['player$i']?.walletBalance =
+          (playerMaps['player$i']!.walletBalance - 100);
+
+      pot += 100;
+      potHolder.updateMoney(pot);
       add(playerMaps['player$i']!);
     }
 
@@ -327,6 +350,7 @@ class MyGame extends FlameGame {
     final yPosition = size.x / 2 - 460;
 
     moneyHolder = MoneyHolder(
+      fontSize: 18,
       bg: moneyHolderSprite,
       position: Vector2(yPosition, size.y / 2 + 120),
       size: Vector2(180, 80),

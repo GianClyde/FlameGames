@@ -4,13 +4,15 @@ import 'package:flutter/painting.dart';
 
 class MoneyHolder extends SpriteComponent with HasGameReference<MyGame> {
   late TextComponent _text;
-  int _money = 0;
+  final double fontSize;
+  double _money = 0;
 
   MoneyHolder({
+    required this.fontSize,
     required Sprite bg,
     required Vector2 position,
     required Vector2 size,
-  }) : super(position: position, size: size, priority: -1, sprite: bg);
+  }) : super(position: position, size: size, priority: 10, sprite: bg);
 
   @override
   Future<void> onLoad() async {
@@ -19,9 +21,9 @@ class MoneyHolder extends SpriteComponent with HasGameReference<MyGame> {
       position: Vector2(50, size.y / 2),
       anchor: Anchor.center,
       textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Color(0xFFFFFFFF),
-          fontSize: 18,
+        style: TextStyle(
+          color: const Color(0xFFFFFFFF),
+          fontSize: fontSize,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -31,7 +33,7 @@ class MoneyHolder extends SpriteComponent with HasGameReference<MyGame> {
     add(_text);
   }
 
-  void updateMoney(int newAmount) {
+  void updateMoney(double newAmount) {
     _money = newAmount;
     _text.text = '\$$_money';
   }
