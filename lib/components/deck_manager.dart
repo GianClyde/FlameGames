@@ -50,7 +50,7 @@ class DeckManager {
   }
 
   Card? drawCard() {
-    if (_deck.isEmpty || getDeckSize() == 1) {
+    if (_deck.isEmpty || _deck.length == 1) {
       deckEmpty = true;
       print("CARD COUNT: $deckEmpty");
       return null;
@@ -64,7 +64,11 @@ class DeckManager {
     deckEmpty = false;
     _totalCards = 0;
     await load();
-
+    if (_deck.isEmpty) {
+      print("CARD COUNT: ERROR: Deck failed to reset properly.");
+    } else {
+      print("CARD COUNT: Deck reset successfully. Card count: ${_deck.length}");
+    }
     print("CARD COUNT: DECK RESET to ${_deck.length}");
   }
 

@@ -56,8 +56,6 @@ class MyGame extends FlameGame {
   late Card playerGuessCard;
   late Card playerCard2;
 
-  bool deckResetting = false;
-
   // Predefined table positions for players
   final List<Vector2> tableCoordinates = [
     Vector2(320, 260),
@@ -485,27 +483,20 @@ class MyGame extends FlameGame {
     currentPlayerIndex = (currentPlayerIndex + 1) % room.userList.length;
     activePlayer = playerMaps["player$currentPlayerIndex"]!;
 
-    if (!deckResetting) {
-      final newCard1 = deckManager.drawCard();
-      final newGuessCard = deckManager.drawCard();
-      final newCard2 = deckManager.drawCard();
+    final newCard1 = deckManager.drawCard();
+    final newGuessCard = deckManager.drawCard();
+    final newCard2 = deckManager.drawCard();
 
-      if (newCard1 == null || newGuessCard == null || newCard2 == null) {
-        print("One or more drawn cards are null. Skipping turn.");
-        return;
-      }
+    activePlayer.card1 = newCard1;
+    activePlayer.guessCard = newGuessCard;
+    activePlayer.card2 = newCard2;
 
-      activePlayer.card1 = newCard1;
-      activePlayer.guessCard = newGuessCard;
-      activePlayer.card2 = newCard2;
+    activePlayer.gameCard1?.updateCard(newCard1!);
+    activePlayer.gameGuessCard?.updateCard(newGuessCard!);
+    activePlayer.gameCard2?.updateCard(newCard2!);
 
-      activePlayer.gameCard1?.updateCard(newCard1);
-      activePlayer.gameGuessCard?.updateCard(newGuessCard);
-      activePlayer.gameCard2?.updateCard(newCard2);
-
-      activePlayer.setTurn(true);
-      gameTimer.reset();
-    }
+    activePlayer.setTurn(true);
+    gameTimer.reset();
   }
 
   Future<void> gameFlow() async {
@@ -525,7 +516,7 @@ class MyGame extends FlameGame {
           guessCard.resetFlip();
           card2.resetFlip();
           hasBet = false;
-          startIntervalTimer(5);
+          startIntervalTimer(3);
         }
       },
     );
