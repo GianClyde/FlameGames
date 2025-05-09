@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/sprite.dart';
+import 'package:flame_practice/game.dart';
 import 'package:flame_practice/models/card.dart';
 
 class DeckManager {
@@ -62,6 +64,8 @@ class DeckManager {
     deckEmpty = false;
     _totalCards = 0;
     await load();
+
+    print("CARD COUNT: DECK RESET to ${_deck.length}");
   }
 
   int getDrawnCount() {
@@ -71,4 +75,6 @@ class DeckManager {
   int getDeckSize() {
     return _deck.length;
   }
+
+  int get remainingCards => _deck.length;
 }
