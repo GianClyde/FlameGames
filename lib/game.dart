@@ -487,13 +487,18 @@ class MyGame extends FlameGame {
     final newGuessCard = deckManager.drawCard();
     final newCard2 = deckManager.drawCard();
 
+    if (newCard1 == null || newGuessCard == null || newCard2 == null) {
+      print("One or more drawn cards are null. Skipping turn.");
+      return;
+    }
+
     activePlayer.card1 = newCard1;
     activePlayer.guessCard = newGuessCard;
     activePlayer.card2 = newCard2;
 
-    activePlayer.gameCard1?.updateCard(newCard1!);
-    activePlayer.gameGuessCard?.updateCard(newGuessCard!);
-    activePlayer.gameCard2?.updateCard(newCard2!);
+    activePlayer.gameCard1?.updateCard(newCard1);
+    activePlayer.gameGuessCard?.updateCard(newGuessCard);
+    activePlayer.gameCard2?.updateCard(newCard2);
 
     activePlayer.setTurn(true);
     gameTimer.reset();
@@ -531,7 +536,6 @@ class MyGame extends FlameGame {
       onTick: () async {
         hasShownWinnerOverlay = false;
         hasFolded = false;
-
         await switchToNextPlayer();
 
         headerText.updateUserName(activePlayer.user.userName);

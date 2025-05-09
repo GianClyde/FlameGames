@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame_practice/game.dart';
 import 'package:flame_practice/models/card.dart';
 
 class DeckManager {
@@ -50,9 +49,7 @@ class DeckManager {
   }
 
   Card? drawCard() {
-    if (_deck.isEmpty || _deck.length == 1) {
-      deckEmpty = true;
-      print("CARD COUNT: $deckEmpty");
+    if (_deck.isEmpty) {
       return null;
     }
     return _deck.removeLast();
@@ -62,14 +59,12 @@ class DeckManager {
     _deck.clear();
     _isLoaded = false;
     deckEmpty = false;
-    _totalCards = 0;
     await load();
     if (_deck.isEmpty) {
       print("CARD COUNT: ERROR: Deck failed to reset properly.");
     } else {
       print("CARD COUNT: Deck reset successfully. Card count: ${_deck.length}");
     }
-    print("CARD COUNT: DECK RESET to ${_deck.length}");
   }
 
   int getDrawnCount() {
